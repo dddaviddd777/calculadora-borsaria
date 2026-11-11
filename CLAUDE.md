@@ -1,10 +1,13 @@
 # Màquina del Temps Borsària
 
-Calculadora d'inversió en una sola pàgina (`index.html`): mostra què hauria passat si haguessis invertit en un índex o una acció en el passat, i projecta què podria passar cap al futur. Tota la interfície i els textos són en **català**.
+Calculadora d'inversió (`index.html`), amb una pàgina educativa complementària (`apren.html`): mostra què hauria passat si haguessis invertit en un índex o una acció en el passat, i projecta què podria passar cap al futur. Tota la interfície i els textos són en **català**.
 
 ## Estructura
 
-- `index.html` — tot el projecte: HTML, CSS i JS en un sol fitxer. Sense build ni dependències locals; s'obre directament al navegador.
+- `index.html` — la calculadora: HTML, CSS i JS en un sol fitxer. Sense build ni dependències locals; s'obre directament al navegador.
+- `apren.html` — «Aprèn · Suplement per a l'inversor»: guia educativa en 7 capítols plegables (fonaments, fons i ETFs, tipus d'ordres, apalancament i venda en curt, risc i estratègia, impostos a Espanya, glossari). Cada concepte té un `id` per enllaçar-hi des del glossari. Copia les variables de color de `index.html`; si en canvies una, canvia-la a tots dos fitxers.
+- Els botons «Prova-ho a la calculadora» obren `index.html` amb paràmetres a l'adreça, que llegeix `readParams()`: `sel` (ids d'`ASSETS` separats per comes), `dca`, `initial`, `monthly`, `start` (any o `now`), `end`, i `div`/`fx`/`inf`/`net`/`log` (`1` o `0`).
+- Publicat a GitHub Pages des de la branca `main`: https://dddaviddd777.github.io/calculadora-borsaria/
 - Únic recurs extern: Chart.js 4.4.1 des de jsDelivr, i les fonts de Google Fonts (Old Standard TT, Libre Caslon Text, IBM Plex Mono).
 
 ## Dades

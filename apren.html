@@ -1,0 +1,695 @@
+<!doctype html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Aprèn · Màquina del Temps Borsària</title>
+<meta name="description" content="Guia senzilla per entendre la borsa: accions, fons, ETFs, tipus d'ordres, apalancament, venda en curt, risc i impostos a Espanya.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#E6D3A8; --surface:#F1E3BF; --ink:#2B1D0E; --muted:#6E5634; --line:#BFA372; --soft:#E2CB98;
+  --accent:#8A4A12; --accent-ink:#F6EBCF; --good:#4E6B1F; --bad:#9B2C1A;
+  --f-display:"Old Standard TT", "Times New Roman", Georgia, serif;
+  --f-body:"Libre Caslon Text", Georgia, "Times New Roman", serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#1E170E; --surface:#2A2014; --ink:#EBDCB8; --muted:#B39C74; --line:#4A3A24; --soft:#33281A;
+  --accent:#E0A050; --accent-ink:#1E170E; --good:#A9BF6A; --bad:#E77A5F;
+  color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#1E170E; --surface:#2A2014; --ink:#EBDCB8; --muted:#B39C74; --line:#4A3A24; --soft:#33281A;
+  --accent:#E0A050; --accent-ink:#1E170E; --good:#A9BF6A; --bad:#E77A5F;
+  color-scheme:dark }
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15.5px;line-height:1.6;
+  background-image:radial-gradient(ellipse at center, transparent 55%, var(--soft) 100%);background-attachment:fixed;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:24px 48px}
+.wrap{max-width:1120px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+a{color:var(--accent)}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* capçalera */
+.masthead{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 16px;font-family:var(--f-mono);font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.masthead a{color:var(--ink);text-decoration:none;border:1px solid var(--ink);padding:6px 10px}
+.masthead a:hover{background:var(--soft)}
+header{border-top:4px double var(--ink);border-bottom:1px solid var(--ink);padding-block:16px 14px;text-align:center}
+.kicker{font-family:var(--f-display);font-size:12.5px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;margin:0 0 6px}
+h1{font-family:var(--f-display);font-weight:700;font-size:clamp(40px,8vw,76px);line-height:1;margin:0;letter-spacing:-.01em}
+.sub{font-style:italic;color:var(--muted);margin:10px auto 0;max-width:64ch}
+
+/* sumari */
+.sumari{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:0;border:1px solid var(--line);background:var(--surface)}
+.sumari a{display:flex;gap:12px;align-items:baseline;padding:14px 16px;text-decoration:none;color:var(--ink);border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.sumari a:hover{background:var(--soft)}
+.sumari .n{font-family:var(--f-display);font-weight:700;font-size:22px;color:var(--accent);min-width:2.2ch}
+.sumari b{display:block;font-family:var(--f-display);font-size:17px}
+.sumari small{display:block;color:var(--muted);font-size:13px;line-height:1.4}
+.tools{display:flex;justify-content:flex-end;gap:8px}
+.tools button{border:1px dashed var(--line);background:transparent;color:var(--ink);border-radius:6px;font:500 13px var(--f-body);padding:6px 11px;cursor:pointer}
+.tools button:hover{border-color:var(--accent);color:var(--accent)}
+
+/* capítols */
+details.cap{background:var(--surface);border:1px solid var(--line);border-radius:2px;box-shadow:0 1px 0 var(--line), 0 6px 18px -12px rgba(60,35,10,.45);scroll-margin-top:16px}
+details.cap > summary{list-style:none;cursor:pointer;display:flex;align-items:baseline;gap:14px;padding:18px 20px}
+details.cap > summary::-webkit-details-marker{display:none}
+details.cap > summary .n{font-family:var(--f-display);font-weight:700;font-size:15px;letter-spacing:.14em;color:var(--accent);min-width:3ch}
+details.cap > summary h2{font-family:var(--f-display);font-weight:700;font-size:clamp(22px,3.2vw,30px);line-height:1.15;margin:0;flex:1}
+details.cap > summary .tog{font-family:var(--f-mono);font-size:18px;color:var(--muted);transition:transform .2s}
+details.cap[open] > summary .tog{transform:rotate(45deg)}
+details.cap[open] > summary{border-bottom:1px solid var(--line)}
+.capbody{padding:20px;display:flex;flex-direction:column;gap:22px}
+.intro{font-size:16.5px;margin:0;max-width:75ch}
+.intro::first-letter{font-family:var(--f-display);font-weight:700;float:left;font-size:3.3em;line-height:.85;padding:4px 8px 0 0;color:var(--accent)}
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 30px}
+@media (max-width:820px){.cards{grid-template-columns:minmax(0,1fr)}}
+.concept{display:flex;flex-direction:column;gap:8px;border-top:2px solid var(--ink);padding-top:10px;scroll-margin-top:16px}
+.concept.wide{grid-column:1/-1}
+.concept h3{font-family:var(--f-display);font-weight:700;font-size:21px;line-height:1.2;margin:0}
+.concept h3 .en{font-family:var(--f-body);font-style:italic;font-weight:400;font-size:14px;color:var(--muted);margin-left:6px}
+.concept p{margin:0}
+.def{font-weight:700;font-size:15.5px}
+.ex{background:var(--bg);border-left:3px solid var(--accent);padding:10px 12px;font-size:14.5px}
+.ex b:first-child{font-family:var(--f-display);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);display:block;margin-bottom:2px}
+.warn{border:1px solid var(--bad);padding:10px 12px;font-size:14.5px}
+.warn b:first-child{font-family:var(--f-display);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--bad);display:block;margin-bottom:2px}
+.try{align-self:flex-start;display:inline-flex;gap:6px;align-items:center;font:500 13px var(--f-body);color:var(--accent);text-decoration:none;border:1px solid var(--accent);border-radius:999px;padding:4px 12px;margin-top:2px}
+.try:hover{background:var(--accent);color:var(--accent-ink)}
+.concept ul{margin:0;padding-left:20px}
+.concept li{margin-bottom:4px}
+.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-size:.93em}
+
+/* taules */
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{font-family:var(--f-display);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;text-align:left;padding:8px 10px;border-top:2px solid var(--ink);border-bottom:1px solid var(--ink);white-space:nowrap}
+td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+td:first-child{font-weight:700}
+td.r,th.r{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.pos{color:var(--good)} .neg{color:var(--bad)}
+
+/* gràfics de les ordres */
+.fig{margin:4px 0 0;background:var(--bg);border:1px solid var(--line);padding:8px}
+.fig svg{display:block;width:100%;height:auto}
+.fig figcaption{font-size:12.5px;color:var(--muted);font-style:italic;margin-top:4px}
+.s-price{fill:none;stroke:var(--ink);stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.s-level{fill:none;stroke:var(--accent);stroke-width:1.5;stroke-dasharray:5 4}
+.s-trail{fill:none;stroke:var(--accent);stroke-width:1.5;stroke-dasharray:5 4}
+.s-now{stroke:var(--muted);stroke-width:1;stroke-dasharray:2 3}
+.s-hit{fill:var(--bad)}
+.s-ok{fill:var(--good)}
+.s-txt{fill:var(--muted);font-family:var(--f-mono);font-size:10px}
+.s-txt-a{fill:var(--accent);font-family:var(--f-mono);font-size:10px}
+.s-txt-h{fill:var(--ink);font-family:var(--f-mono);font-size:10px;font-weight:500}
+
+/* glossari */
+.gloss{columns:2 300px;column-gap:32px;column-rule:1px solid var(--line);margin:0}
+.gloss div{break-inside:avoid;margin:0 0 10px}
+.gloss dt{font-family:var(--f-display);font-weight:700;font-size:16px}
+.gloss dt a{color:var(--ink);text-decoration-color:var(--line)}
+.gloss dt .en{font-family:var(--f-body);font-style:italic;font-weight:400;font-size:13px;color:var(--muted);margin-left:4px}
+.gloss dd{margin:0;font-size:14px;color:var(--muted)}
+
+footer{font-size:12.5px;color:var(--muted);border-top:1px solid var(--ink);padding-top:12px;line-height:1.6}
+footer p{margin:0 0 6px;max-width:90ch}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="masthead">
+    <a href="index.html">← Torna a la calculadora</a>
+    <span>Suplement per a l'inversor · Edició de novembre de 2026</span>
+  </div>
+
+  <header>
+    <p class="kicker">Màquina del Temps Borsària</p>
+    <h1>Aprèn</h1>
+    <p class="sub">Els conceptes clau per entendre la borsa, explicats amb paraules planeres i exemples amb números: de què és una acció fins a com funcionen l'apalancament, la venda en curt i els impostos.</p>
+  </header>
+
+  <nav class="sumari" aria-label="Sumari">
+    <a href="#c1"><span class="n">I</span><span><b>Els fonaments</b><small>Accions, borsa, índexs, bons i interès compost</small></span></a>
+    <a href="#c2"><span class="n">II</span><span><b>Fons i ETFs</b><small>Fons d'inversió, ETFs, acumulació i distribució</small></span></a>
+    <a href="#c3"><span class="n">III</span><span><b>Tipus d'ordres</b><small>A mercat, límit, stop loss i trailing stop</small></span></a>
+    <a href="#c4"><span class="n">IV</span><span><b>Diners que no són teus</b><small>Apalancament, marge i venda en curt</small></span></a>
+    <a href="#c5"><span class="n">V</span><span><b>Risc i estratègia</b><small>Diversificació, volatilitat, DCA i comissions</small></span></a>
+    <a href="#c6"><span class="n">VI</span><span><b>Impostos a Espanya</b><small>IRPF de l'estalvi, pèrdues i traspassos</small></span></a>
+    <a href="#c7"><span class="n">VII</span><span><b>Glossari</b><small>Tots els termes, de la A a la Z</small></span></a>
+  </nav>
+
+  <div class="tools">
+    <button type="button" id="open-all">Desplega-ho tot</button>
+    <button type="button" id="close-all">Plega-ho tot</button>
+  </div>
+
+  <!-- ============ I ============ -->
+  <details class="cap" id="c1" open>
+    <summary><span class="n">I</span><h2>Els fonaments</h2><span class="tog" aria-hidden="true">+</span></summary>
+    <div class="capbody">
+      <p class="intro">Abans de parlar de productes i estratègies cal tenir clares les peces bàsiques: què compres quan inverteixes en borsa, on es compra i com es mesura si el mercat puja o baixa.</p>
+      <div class="cards">
+
+        <article class="concept" id="accio">
+          <h3>Acció <span class="en">share · stock</span></h3>
+          <p class="def">Una acció és una petita part de la propietat d'una empresa.</p>
+          <p>Quan una empresa divideix el seu capital en milions de parts iguals, cadascuna és una acció. Qui en té és <em>accionista</em> (<em>shareholder</em>): és copropietari del negoci, participa dels seus beneficis i normalment pot votar a la junta d'accionistes. Si l'empresa creix i guanya més diners, el preu de l'acció tendeix a pujar; si les coses van malament, baixa, i en el pitjor cas (fallida) pot arribar a zero.</p>
+          <p class="ex"><b>Exemple</b>Una empresa té 1.000.000 d'accions. Si en compres 1.000, ets propietari d'un 0,1% de l'empresa.</p>
+        </article>
+
+        <article class="concept" id="dividend">
+          <h3>Dividend <span class="en">dividend</span></h3>
+          <p class="def">Un dividend és la part dels beneficis que l'empresa reparteix en efectiu entre els accionistes.</p>
+          <p>No totes les empreses en paguen: algunes prefereixen reinvertir els beneficis per créixer (és el cas típic de les tecnològiques). El <em>rendiment per dividend</em> (<em>dividend yield</em>) és el dividend anual dividit pel preu de l'acció.</p>
+          <p class="ex"><b>Exemple</b>Una acció val 40 € i paga 1,60 € de dividend a l'any: rendiment del 4%. Si el reinverteixes comprant més accions, el teu capital creix encara que el preu no es mogui.</p>
+          <a class="try" href="index.html?sel=ibex&start=2000&end=2026&div=1">Prova-ho a la calculadora →</a>
+        </article>
+
+        <article class="concept" id="borsa">
+          <h3>Borsa i mercat</h3>
+          <p class="def">La borsa és el mercat organitzat on es compren i es venen accions i altres valors entre inversors.</p>
+          <p>Quan una empresa surt a borsa per primera vegada fa una <em>OPV</em> (oferta pública de venda; en anglès, <em>IPO</em>): és el <em>mercat primari</em>, on els diners van a l'empresa. A partir d'aquí, les accions canvien de mans entre inversors al <em>mercat secundari</em>, que és el que veiem cada dia. El preu el fixa l'oferta i la demanda: si hi ha més gent que vol comprar que vendre, puja.</p>
+          <p>Exemples de borses: la Borsa de Madrid, Euronext (París, Amsterdam…), Xetra (Frankfurt), la NYSE i el Nasdaq (Nova York).</p>
+        </article>
+
+        <article class="concept" id="broker">
+          <h3>Broker</h3>
+          <p class="def">El broker és l'entitat intermediària que t'obre un compte i executa les teves ordres al mercat.</p>
+          <p>Un particular no pot comprar directament a la borsa: ho fa a través d'un banc o d'un broker. Quan triïs broker, fixa't en què està regulat (a Espanya, per la CNMV o per l'organisme del seu país europeu), en les comissions per operació i de custòdia, i en quins mercats i productes ofereix. Els teus valors estan a nom teu i separats dels diners del broker. A més, si el broker fa fallida i falten actius, hi ha fons de garantia d'inversions: a la UE cobreixen un mínim de 20.000 €, i a Espanya el FOGAIN cobreix fins a 100.000 €.</p>
+        </article>
+
+        <article class="concept" id="index">
+          <h3>Índex borsari <span class="en">stock index</span></h3>
+          <p class="def">Un índex és un indicador que resumeix en un sol número l'evolució d'un grup d'accions.</p>
+          <p>L'<strong>IBEX 35</strong> agrupa les 35 empreses més líquides de la borsa espanyola; l'<strong>S&amp;P 500</strong>, 500 grans empreses dels Estats Units; el <strong>MSCI World</strong>, unes 1.400 empreses de 23 països desenvolupats. La majoria pondera per capitalització: com més gran és l'empresa, més pes té. Un índex no es pot comprar directament, però sí a través d'un fons o un ETF que el repliqui.</p>
+          <p>Compte: hi ha índexs <em>de preu</em> (<em>price index</em>: només el preu de les accions) i <em>de rendiment total</em> (<em>total return</em>: sumen els dividends reinvertits). Per això l'IBEX 35 «oficial» queda per sota del que realment hauria guanyat un inversor.</p>
+          <a class="try" href="index.html?sel=spx,msci,ibex&start=2000&end=2026&log=1">Compara índexs a la calculadora →</a>
+        </article>
+
+        <article class="concept" id="capitalitzacio">
+          <h3>Capitalització borsària <span class="en">market cap</span></h3>
+          <p class="def">És el valor total d'una empresa a borsa: el preu de l'acció multiplicat pel nombre d'accions.</p>
+          <p>Serveix per comparar la mida de les empreses. S'acostumen a classificar en <em>large caps</em> (grans), <em>mid caps</em> (mitjanes) i <em>small caps</em> (petites). El preu d'una sola acció no diu res de la mida: una acció de 500 € pot ser d'una empresa més petita que una de 5 €.</p>
+          <p class="ex"><b>Exemple</b>2.000 milions d'accions × 25 € = 50.000 milions d'euros de capitalització.</p>
+        </article>
+
+        <article class="concept" id="bo">
+          <h3>Bo i renda fixa <span class="en">bond · fixed income</span></h3>
+          <p class="def">Un bo és un préstec que fas a un estat o a una empresa a canvi d'uns interessos pactats.</p>
+          <p>Paga un interès periòdic (el <em>cupó</em>, <em>coupon</em>) i retorna el capital en una data fixa (el <em>venciment</em>, <em>maturity</em>). Sol ser menys volàtil que les accions, però també rendeix menys a llarg termini. El seu preu de mercat es mou en sentit contrari als tipus d'interès: si els tipus pugen, els bons antics, que paguen menys, perden valor. Per això els bons van caure amb força el 2022.</p>
+        </article>
+
+        <article class="concept" id="interes-compost">
+          <h3>Rendibilitat i interès compost <span class="en">return · compound interest</span></h3>
+          <p class="def">L'interès compost vol dir guanyar rendiments també sobre els rendiments que ja havies guanyat.</p>
+          <p>La rendibilitat és el que guanyes (o perds) en percentatge sobre el que has invertit. Quan els guanys es reinverteixen, el creixement s'accelera amb el temps: és una bola de neu. La <em>regla del 72</em> ho resumeix: divideix 72 per la rendibilitat anual i obtens els anys aproximats que triga el capital a doblar-se.</p>
+          <p class="ex"><b>Exemple</b>10.000 € al 7% anual: als 10 anys són <span class="num">19.700 €</span>; als 20, <span class="num">38.700 €</span>; als 30, <span class="num">76.100 €</span>. Els últims 10 anys aporten més que els 20 primers junts. Regla del 72: 72 / 7 ≈ 10 anys per doblar.</p>
+          <a class="try" href="index.html?sel=msci&start=2000&end=2046">Mira l'efecte a 46 anys →</a>
+        </article>
+
+      </div>
+    </div>
+  </details>
+
+  <!-- ============ II ============ -->
+  <details class="cap" id="c2">
+    <summary><span class="n">II</span><h2>Fons d'inversió i ETFs</h2><span class="tog" aria-hidden="true">+</span></summary>
+    <div class="capbody">
+      <p class="intro">Comprar accions una a una exigeix temps, coneixement i molts diners per diversificar. Els fons i els ETFs resolen això: amb una sola compra tens una cistella de centenars o milers de valors.</p>
+      <div class="cards">
+
+        <article class="concept" id="fons">
+          <h3>Fons d'inversió <span class="en">mutual fund</span></h3>
+          <p class="def">Un fons d'inversió reuneix els diners de molts inversors i un gestor els inverteix en una cartera de valors.</p>
+          <p>Compres <em>participacions</em> del fons. El seu preu, el <em>valor liquidatiu</em> (<em>NAV</em>, <em>net asset value</em>), es calcula un cop al dia, després del tancament dels mercats: no saps el preu exacte quan dones l'ordre. Els fons poden ser de <strong>gestió activa</strong> (el gestor tria valors per intentar batre el mercat, amb comissions més altes, sovint entre l'1% i el 2% anual) o de <strong>gestió passiva</strong>.</p>
+          <p>La majoria de fons actius no aconsegueixen batre el seu índex de referència a llarg termini un cop descomptades les comissions.</p>
+        </article>
+
+        <article class="concept" id="fons-indexat">
+          <h3>Fons indexat <span class="en">index fund</span></h3>
+          <p class="def">Un fons indexat és un fons de gestió passiva que es limita a copiar un índex.</p>
+          <p>No intenta batre el mercat, sinó obtenir el mateix que el mercat amb el mínim cost. Les comissions solen anar del 0,1% al 0,5% anual. Són la base de la inversió passiva a llarg termini, i a Espanya tenen l'avantatge fiscal dels <a href="#traspassos">traspassos</a>.</p>
+        </article>
+
+        <article class="concept wide" id="etf">
+          <h3>ETF <span class="en">Exchange Traded Fund</span></h3>
+          <p class="def">Un ETF és un fons d'inversió que cotitza a borsa i es compra i es ven com si fos una acció.</p>
+          <p>L'acrònim vol dir <em>Exchange Traded Fund</em>, literalment «fons negociat en borsa»: en català en diem <strong>fons cotitzat</strong>. La gran majoria replica un índex (l'S&amp;P 500, el MSCI World, l'Euro Stoxx 50…), tot i que n'hi ha de temàtics, de bons, de matèries primeres o de gestió activa.</p>
+          <p>La diferència clau amb un fons tradicional és que <strong>té preu en temps real</strong> durant tota la sessió: el compres a través d'un broker, al preu del moment, i hi pots fer servir qualsevol <a href="#c3">tipus d'ordre</a>. Darrere hi ha uns intermediaris (els <em>creadors de mercat</em> o <em>market makers</em>) que creen i eliminen participacions perquè el preu de l'ETF es mantingui molt a prop del valor real dels actius que conté.</p>
+          <p class="ex"><b>Exemple</b>Amb un ETF del MSCI World de 100 € per participació, una sola compra et fa propietari indirecte d'unes 1.400 empreses de 23 països, amb una comissió anual que pot ser del 0,2% (2 € per cada 1.000 € invertits).</p>
+        </article>
+
+        <article class="concept" id="acumulacio">
+          <h3>Acumulació i distribució <span class="en">accumulating · distributing</span></h3>
+          <p class="def">Un fons o ETF d'acumulació reinverteix els dividends automàticament; un de distribució te'ls paga al compte.</p>
+          <p>Ho veuràs al nom del producte amb les sigles <strong>Acc</strong> (<em>accumulating</em>) o <strong>Dist</strong> (<em>distributing</em>).</p>
+          <ul>
+            <li><strong>Acumulació:</strong> els dividends es queden dins i fan créixer el valor de la participació. A Espanya no tributes fins que vens, de manera que els diners que haurien anat a impostos continuen generant rendiment (interès compost). És l'opció habitual si estàs acumulant patrimoni.</li>
+            <li><strong>Distribució:</strong> reps els dividends periòdicament (trimestral, semestral…) i tributen cada any com a rendiment del capital, amb una retenció del 19%. Té sentit si vols ingressos regulars, per exemple, a la jubilació.</li>
+          </ul>
+          <a class="try" href="index.html?sel=ibex&start=2000&end=2026">Activa i desactiva «Dividends reinvertits» →</a>
+        </article>
+
+        <article class="concept" id="replicacio">
+          <h3>Com copien l'índex <span class="en">replication</span></h3>
+          <p class="def">La replicació és el mètode amb què un fons o ETF aconsegueix comportar-se com el seu índex.</p>
+          <ul>
+            <li><strong>Física completa:</strong> compra totes les accions de l'índex, en la mateixa proporció.</li>
+            <li><strong>Física per mostreig:</strong> compra una selecció representativa quan l'índex té milers de valors.</li>
+            <li><strong>Sintètica:</strong> no té les accions de l'índex, sinó un contracte (<em>swap</em>) amb un banc que li paga la rendibilitat de l'índex. Afegeix un petit risc que el banc falli, limitat per la normativa europea.</li>
+          </ul>
+        </article>
+
+        <article class="concept" id="ter">
+          <h3>TER, tracking error i UCITS</h3>
+          <p class="def">El TER és la comissió anual total d'un fons, i es descompta del valor de la participació sense que te n'adonis.</p>
+          <p>El <strong>TER</strong> (<em>Total Expense Ratio</em>) és el cost que més pesa a llarg termini (vegeu <a href="#comissions">el pes de les comissions</a>). El <strong>tracking error</strong> mesura com se separa el fons de l'índex que diu copiar: com més petit, millor. <strong>UCITS</strong> és el segell europeu que garanteix unes normes de diversificació, transparència i protecció de l'inversor; els particulars europeus, de fet, només poden comprar ETFs que tinguin el document d'informació clau (KID), i per això no hi ha accés a la majoria d'ETFs domiciliats als Estats Units.</p>
+        </article>
+
+        <article class="concept wide" id="fons-vs-etf">
+          <h3>Fons indexat o ETF: comparativa</h3>
+          <div class="tablewrap">
+            <table>
+              <thead><tr><th></th><th>Fons indexat</th><th>ETF</th></tr></thead>
+              <tbody>
+                <tr><td>On es compra</td><td>Al banc, a la gestora o en plataformes de fons</td><td>A borsa, a través d'un broker</td></tr>
+                <tr><td>Preu</td><td>Un cop al dia (valor liquidatiu)</td><td>En temps real durant la sessió</td></tr>
+                <tr><td>Tipus d'ordres</td><td>Només «comprar» o «vendre» un import</td><td>A mercat, límit, stop loss, trailing stop…</td></tr>
+                <tr><td>Comissió anual (TER)</td><td>Habitualment 0,1%–0,5%</td><td>Habitualment 0,05%–0,4%</td></tr>
+                <tr><td>Cost per operació</td><td>Normalment cap</td><td>Comissió del broker + <a href="#spread">spread</a></td></tr>
+                <tr><td>Aportacions petites periòdiques</td><td>Molt fàcil, sovint des d'1 €</td><td>Depèn del broker (plans d'inversió automàtics)</td></tr>
+                <tr><td>Traspàs sense pagar impostos</td><td class="pos">Sí</td><td class="neg">No (per a particulars a Espanya)</td></tr>
+                <tr><td>Oferta</td><td>Més limitada</td><td>Molt àmplia: qualsevol índex, sector o país</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>En resum: el fons indexat és més còmode i fiscalment més flexible per anar aportant a llarg termini; l'ETF dona més control, més varietat i sovint costos lleugerament més baixos.</p>
+        </article>
+
+      </div>
+    </div>
+  </details>
+
+  <!-- ============ III ============ -->
+  <details class="cap" id="c3">
+    <summary><span class="n">III</span><h2>Tipus d'ordres</h2><span class="tog" aria-hidden="true">+</span></summary>
+    <div class="capbody">
+      <p class="intro">Una ordre és la instrucció que dones al broker per comprar o vendre. No és només «compra» o «ven»: pots decidir a quin preu, en quines condicions i durant quant de temps és vàlida. Triar bé l'ordre et protegeix de sorpreses.</p>
+      <div class="cards">
+
+        <article class="concept wide" id="spread">
+          <h3>Bid, ask i spread <span class="en">preu de compra, preu de venda i diferencial</span></h3>
+          <p class="def">En tot moment hi ha dos preus: el més alt que algú està disposat a pagar (bid) i el més baix al qual algú està disposat a vendre (ask). La diferència entre tots dos és el spread.</p>
+          <p>Si compres a mercat, pagues el preu <em>ask</em>; si vens a mercat, cobres el preu <em>bid</em>. El <em>spread</em> és un cost amagat de cada operació: en valors molt negociats (grans empreses, ETFs populars) és mínim; en valors poc líquids o fora de l'horari principal pot ser gran.</p>
+          <p class="ex"><b>Exemple</b>Bid 49,95 € · Ask 50,05 € · Spread 0,10 €. Si compres i vens a l'instant, perds 0,10 € per acció (un 0,2%) encara que el preu «no s'hagi mogut».</p>
+        </article>
+
+        <article class="concept" id="ordre-mercat">
+          <h3>Ordre a mercat <span class="en">market order</span></h3>
+          <p class="def">Compra o ven immediatament al millor preu disponible en aquell moment.</p>
+          <p>Té l'avantatge que s'executa segur i a l'instant. L'inconvenient és que no controles el preu final: si el mercat es mou de pressa o hi ha poca liquiditat, pots pagar més del que esperaves (<a href="#slippage">slippage</a>).</p>
+          <figure class="fig">
+            <svg viewBox="0 0 280 120" role="img" aria-label="El preu evoluciona fins al moment de l'ordre, que s'executa a l'instant al preu actual">
+              <line class="s-now" x1="190" y1="8" x2="190" y2="112"/>
+              <polyline class="s-price" points="10,70 40,62 70,75 100,55 130,60 160,48 190,52"/>
+              <circle class="s-ok" cx="190" cy="52" r="5"/>
+              <text class="s-txt" x="194" y="18">ordre</text>
+              <text class="s-txt-h" x="198" y="56">compra</text>
+              <text class="s-txt-h" x="198" y="68">a ~50 €</text>
+            </svg>
+            <figcaption>S'executa al moment, al preu que hi hagi.</figcaption>
+          </figure>
+          <p class="ex"><b>Quan fer-la servir</b>Per a valors i ETFs molt líquids, en horari de mercat, quan l'important és entrar o sortir i no uns cèntims.</p>
+        </article>
+
+        <article class="concept" id="ordre-limit">
+          <h3>Ordre límit <span class="en">limit order</span></h3>
+          <p class="def">Compra només a un preu igual o inferior al que fixes (o ven només a un preu igual o superior).</p>
+          <p>Controles el preu, però no tens garantit que s'executi: si el mercat no hi arriba, l'ordre queda pendent. Si fixes un límit per sobre del preu actual en una compra, s'executa al moment però mai per sobre del teu límit, cosa que protegeix del <em>slippage</em>.</p>
+          <figure class="fig">
+            <svg viewBox="0 0 280 120" role="img" aria-label="El preu baixa fins a tocar el límit de 45 euros, on s'executa la compra, i després torna a pujar">
+              <line class="s-level" x1="10" y1="85" x2="270" y2="85"/>
+              <polyline class="s-price" points="10,50 50,62 90,58 130,75 170,85 210,70 260,55"/>
+              <circle class="s-ok" cx="170" cy="85" r="5"/>
+              <text class="s-txt-a" x="12" y="100">límit de compra: 45 €</text>
+              <text class="s-txt-h" x="178" y="100">compra a 45 €</text>
+              <text class="s-txt" x="12" y="42">preu actual 52 €</text>
+            </svg>
+            <figcaption>Esperes que el preu baixi fins al teu límit.</figcaption>
+          </figure>
+          <p class="ex"><b>Exemple</b>Una acció cotitza a 52 €. Dones una ordre límit de compra a 45 €. Només comprarà si el preu baixa a 45 € o menys.</p>
+        </article>
+
+        <article class="concept" id="stop-loss">
+          <h3>Ordre de stop loss <span class="en">aturada de pèrdues</span></h3>
+          <p class="def">Ven automàticament si el preu cau fins a un nivell que fixes, per limitar les pèrdues.</p>
+          <p>Mentre el preu estigui per sobre del nivell (el <em>preu d'activació</em> o <em>stop price</em>), no passa res. Quan el toca, l'ordre s'activa i es converteix en una ordre a mercat. Per això el preu final pot ser una mica pitjor que el nivell, sobretot si el valor obre amb un salt a la baixa.</p>
+          <figure class="fig">
+            <svg viewBox="0 0 280 120" role="img" aria-label="El preu cau per sota del nivell de 45 euros, l'ordre s'activa i ven a mercat">
+              <line class="s-level" x1="10" y1="85" x2="270" y2="85"/>
+              <polyline class="s-price" points="10,60 50,52 90,58 130,70 160,85 180,96 210,104 260,94"/>
+              <circle class="s-hit" cx="160" cy="85" r="5"/>
+              <text class="s-txt-a" x="12" y="78">stop: 45 €</text>
+              <text class="s-txt" x="12" y="52">comprat a 50 €</text>
+              <text class="s-txt-h" x="168" y="76">s'activa i ven</text>
+            </svg>
+            <figcaption>Si cau fins al nivell, ven per no perdre més.</figcaption>
+          </figure>
+          <p class="ex"><b>Exemple</b>Has comprat a 50 € i poses un stop loss a 45 €: assumeixes perdre com a màxim un 10% aproximadament.</p>
+          <p class="ex"><b>Variant: stop límit (stop limit)</b>Quan s'activa, en lloc d'una ordre a mercat genera una ordre límit. Evites vendre molt per sota, però si el preu cau en picat pot no vendre's.</p>
+        </article>
+
+        <article class="concept" id="trailing-stop">
+          <h3>Trailing stop <span class="en">stop dinàmic</span></h3>
+          <p class="def">És un stop loss que puja automàticament quan el preu puja, sempre a la mateixa distància, i no baixa mai.</p>
+          <p>La distància es fixa en percentatge o en euros. Si el preu fa un nou màxim, el nivell de venda puja amb ell; si el preu baixa, el nivell es queda quiet. Serveix per <strong>protegir guanys</strong> sense haver de vigilar el mercat cada dia.</p>
+          <figure class="fig">
+            <svg viewBox="0 0 280 120" role="img" aria-label="El preu puja de 50 a 58 euros i el nivell de venda puja amb ell un 10% per sota; quan el preu baixa, toca el nivell a 52 euros i ven">
+              <polyline class="s-trail" points="10,85 60,72 110,58 150,49 270,49"/>
+              <polyline class="s-price" points="10,60 60,45 110,30 150,20 190,35 215,46 250,62"/>
+              <circle class="s-hit" cx="222" cy="49" r="5"/>
+              <text class="s-txt" x="140" y="14">màxim 58 €</text>
+              <text class="s-txt-a" x="20" y="102">el stop puja (−10%)</text>
+              <text class="s-txt-h" x="200" y="74">ven a ~52 €</text>
+            </svg>
+            <figcaption>El nivell segueix el preu cap amunt i es queda quiet quan baixa.</figcaption>
+          </figure>
+          <p class="ex"><b>Exemple</b>Compres a 50 € amb un trailing stop del 10% (stop a 45 €). El preu puja a 58 €: el stop ja és a 52,20 €. Si després cau, vens a uns 52 €, amb guany, en lloc de tornar als 50.</p>
+        </article>
+
+        <article class="concept" id="validesa">
+          <h3>Validesa de l'ordre <span class="en">time in force</span></h3>
+          <p class="def">La validesa indica fins quan l'ordre pendent continua activa.</p>
+          <ul>
+            <li><strong>Només el dia</strong> (<em>day order</em>): si no s'executa abans del tancament, s'anul·la.</li>
+            <li><strong>Fins a una data:</strong> resta activa fins al dia que triïs.</li>
+            <li><strong>Fins que es cancel·li</strong> (<em>GTC</em>, <em>good till cancelled</em>): continua activa fins que s'executi o l'anul·lis, tot i que molts brokers hi posen un màxim de dies.</li>
+          </ul>
+          <p>Revisa les ordres pendents: una ordre oblidada es pot executar mesos després en un context que ja no t'interessa.</p>
+        </article>
+
+        <article class="concept" id="slippage">
+          <h3>Slippage i gaps <span class="en">lliscament i salts de preu</span></h3>
+          <p class="def">Slippage és la diferència entre el preu que esperaves i el preu real al qual s'executa l'ordre.</p>
+          <p>Passa en moments de molta volatilitat o poca liquiditat. Un <em>gap</em> és un salt de preu sense cotitzacions entremig: el preu tanca a 48 € i l'endemà, per una mala notícia, obre a 40 €. Un stop loss a 45 € no ven a 45 €, sinó al primer preu disponible, prop dels 40 €. Un stop loss limita les pèrdues, però no les garanteix.</p>
+        </article>
+
+      </div>
+    </div>
+  </details>
+
+  <!-- ============ IV ============ -->
+  <details class="cap" id="c4">
+    <summary><span class="n">IV</span><h2>Operar amb diners que no són teus</h2><span class="tog" aria-hidden="true">+</span></summary>
+    <div class="capbody">
+      <p class="intro">Es pot invertir més diners dels que tens, o fins i tot apostar que un valor baixarà, demanant prestat al broker. Multiplica els guanys, però també les pèrdues, i és on la majoria d'inversors particulars perden diners. Convé entendre-ho bé abans de tocar-ho.</p>
+      <div class="cards">
+
+        <article class="concept wide" id="apalancament">
+          <h3>Apalancament <span class="en">leverage</span></h3>
+          <p class="def">Apalancar-se és invertir amb diners prestats, de manera que controles una posició més gran que el teu capital.</p>
+          <p>S'expressa com un multiplicador: amb un apalancament de 5:1 (o ×5), cada euro teu mou 5 euros al mercat. Els guanys i les pèrdues es calculen sobre la posició total, però surten del teu capital. Per això un petit moviment del mercat es converteix en un gran moviment dels teus diners.</p>
+          <div class="tablewrap">
+            <table>
+              <thead><tr><th>El mercat es mou</th><th class="r">Sense palanca (1.000 €)</th><th class="r">Amb palanca ×5 (posició de 5.000 €)</th></tr></thead>
+              <tbody>
+                <tr><td>+10%</td><td class="r pos">+100 € (+10%)</td><td class="r pos">+500 € (+50%)</td></tr>
+                <tr><td>−10%</td><td class="r neg">−100 € (−10%)</td><td class="r neg">−500 € (−50%)</td></tr>
+                <tr><td>−20%</td><td class="r neg">−200 € (−20%)</td><td class="r neg">−1.000 € (−100%: ho has perdut tot)</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="warn"><b>Atenció</b>Amb palanca ×5, una caiguda del 20% esborra tot el capital; amb ×10, n'hi ha prou amb un 10%. A més, pagues interessos pels diners prestats tant si guanyes com si perds.</p>
+        </article>
+
+        <article class="concept" id="compte-marge">
+          <h3>Compte normal i compte de marge <span class="en">cash vs margin</span></h3>
+          <p class="def">En un compte normal només operes amb els teus diners; en un compte de marge, el broker et presta diners deixant les teves inversions com a garantia.</p>
+          <p>En el <strong>mercat al comptat</strong> (el que la gent sol anomenar <em>stock</em>, comprar accions de veritat amb diners propis) el pitjor que pot passar és que l'acció valgui zero: perds el que has posat, mai més. En el <strong>margin trading</strong>, el broker et deixa comprar per valor de més del que tens, i et cobra interessos diaris pel préstec. La part que poses tu és el <em>marge</em>.</p>
+          <p class="ex"><b>Exemple</b>Tens 5.000 €. El broker te'n presta 5.000 més i compres accions per 10.000 €. Si pugen un 20% (12.000 €), tornes el préstec i et queden 7.000 €: has guanyat un 40%. Si baixen un 20% (8.000 €), et queden 3.000 €: has perdut un 40%, més els interessos.</p>
+        </article>
+
+        <article class="concept" id="crida-marge">
+          <h3>Marge de manteniment i margin call <span class="en">crida de marge</span></h3>
+          <p class="def">Un margin call és l'avís del broker que has d'aportar més diners perquè les pèrdues han deixat la garantia per sota del mínim.</p>
+          <p>El broker exigeix que la part que és teva no baixi d'un percentatge mínim de la posició (el <em>marge de manteniment</em> o <em>maintenance margin</em>, per exemple el 25%). Si baixa, has d'ingressar diners o vendre. Si no ho fas, o si el mercat cau massa de pressa, el broker <strong>ven les teves posicions automàticament</strong>, sovint en el pitjor moment.</p>
+          <p class="ex"><b>Exemple</b>Amb la posició de 10.000 € (5.000 teus, 5.000 prestats) i un marge de manteniment del 25%, el margin call arriba si la cartera baixa per sota d'uns 6.670 €: una caiguda del 33%.</p>
+          <p class="warn"><b>Atenció</b>En moviments bruscos pots acabar devent diners al broker: perdre més del que havies posat.</p>
+        </article>
+
+        <article class="concept wide" id="venda-curt">
+          <h3>Vendre en curt <span class="en">short selling</span></h3>
+          <p class="def">Vendre en curt és apostar que un valor baixarà: vens accions que no tens (prestades) per recomprar-les més tard, més barates.</p>
+          <p>Funciona en quatre passos: <strong>1)</strong> el broker et presta accions d'un altre client; <strong>2)</strong> les vens al preu d'avui; <strong>3)</strong> més endavant les recompres al mercat; <strong>4)</strong> les tornes al prestador. Si les recompres més barates, guanyes la diferència. Mentre la posició està oberta pagues una comissió pel préstec, i si l'empresa reparteix dividend, l'has de pagar tu.</p>
+          <p>En l'argot es diu <strong>anar curt</strong> o estar <em>short</em>. El contrari, comprar esperant que pugi, és <strong>anar llarg</strong> o estar <em>long</em>.</p>
+          <div class="tablewrap">
+            <table>
+              <thead><tr><th>Vens 10 accions prestades a 100 € (ingresses 1.000 €)</th><th class="r">Recompres a…</th><th class="r">Resultat</th></tr></thead>
+              <tbody>
+                <tr><td>La predicció encerta: l'acció baixa</td><td class="r">80 €</td><td class="r pos">+200 €</td></tr>
+                <tr><td>L'acció puja</td><td class="r">150 €</td><td class="r neg">−500 €</td></tr>
+                <tr><td>L'acció es dispara</td><td class="r">300 €</td><td class="r neg">−2.000 €</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="warn"><b>Atenció</b>Quan compres, com a màxim pots perdre el que has posat (l'acció no pot valer menys de zero). Quan vens en curt, la <strong>pèrdua potencial no té límit</strong>, perquè el preu pot pujar indefinidament. Per això sempre es fa en un compte de marge.</p>
+          <p><strong>Short squeeze.</strong> Si molts inversors estan en curt i el preu comença a pujar, s'afanyen a recomprar per tallar pèrdues; aquestes compres fan pujar encara més el preu, i això obliga a recomprar més gent. És un cercle viciós que pot multiplicar el preu en pocs dies, com va passar amb GameStop el gener de 2021.</p>
+        </article>
+
+        <article class="concept" id="cfd">
+          <h3>CFDs <span class="en">Contract for Difference</span></h3>
+          <p class="def">Un CFD (contracte per diferències) és un contracte amb el broker que et paga o et cobra la variació de preu d'un actiu, sense que el tinguis.</p>
+          <p>Permet apostar a pujades o baixades amb molt d'apalancament i aportant només una garantia. Per protegir els particulars, la normativa europea limita l'apalancament (per exemple, ×5 en accions individuals) i obliga els brokers a publicar quin percentatge de clients hi perd diners: sovint, més del 70%.</p>
+        </article>
+
+        <article class="concept" id="futurs">
+          <h3>Futurs i opcions <span class="en">futures · options</span></h3>
+          <p class="def">Són derivats (<em>derivatives</em>): contractes el valor dels quals depèn d'un altre actiu.</p>
+          <p>Un <strong>futur</strong> és el compromís de comprar o vendre un actiu en una data futura a un preu fixat avui; només es diposita una garantia, de manera que està molt apalancat. Una <strong>opció</strong> dona el <em>dret</em>, però no l'obligació, de comprar (opció <em>call</em>) o vendre (opció <em>put</em>) a un preu fixat fins a una data, a canvi de pagar una prima (<em>premium</em>). Les fan servir professionals per cobrir riscos i per especular; són eines complexes.</p>
+        </article>
+
+        <article class="concept wide" id="etf-apalancat">
+          <h3>ETFs apalancats i inversos <span class="en">leveraged · inverse ETFs</span></h3>
+          <p class="def">Són ETFs que multipliquen (×2, ×3) o inverteixen (−1) el moviment <em>diari</em> d'un índex.</p>
+          <p>La clau és la paraula «diari»: el multiplicador s'aplica cada dia, no sobre tot el període. En mercats que pugen i baixen, això fa perdre valor encara que l'índex acabi igual. Estan pensats per a operacions de molt curt termini.</p>
+          <p class="ex"><b>Exemple</b>Un índex passa de 100 a 110 (+10%) i torna a 99 (−10%): perd un 1%. Un ETF ×3 sobre aquest índex passa de 100 a 130 (+30%) i després a 91 (−30%): perd un 9%.</p>
+        </article>
+
+      </div>
+    </div>
+  </details>
+
+  <!-- ============ V ============ -->
+  <details class="cap" id="c5">
+    <summary><span class="n">V</span><h2>Risc i estratègia</h2><span class="tog" aria-hidden="true">+</span></summary>
+    <div class="capbody">
+      <p class="intro">Invertir sempre té risc: la qüestió és entendre'l i triar quant n'estàs disposat a assumir. Aquests són els principis que més pesen en el resultat a llarg termini, molt per sobre d'endevinar quina acció pujarà.</p>
+      <div class="cards">
+
+        <article class="concept" id="diversificacio">
+          <h3>Diversificació <span class="en">diversification</span></h3>
+          <p class="def">Diversificar és repartir els diners entre molts valors, sectors i països perquè un mal resultat no t'enfonsi.</p>
+          <p>Una sola empresa pot perdre la meitat del seu valor en un any (Nvidia va caure un 50% el 2022) o desaparèixer. Un índex mundial amb milers d'empreses reparteix aquest risc. Diversificar no evita les caigudes generals del mercat, però sí el risc de quedar atrapat en una mala empresa o un mal país.</p>
+          <a class="try" href="index.html?sel=msci,ibex,nvda&start=2016&end=2026&log=1">Compara una acció amb un índex mundial →</a>
+        </article>
+
+        <article class="concept" id="volatilitat">
+          <h3>Volatilitat i drawdown <span class="en">volatility · drawdown</span></h3>
+          <p class="def">La volatilitat mesura com de fort oscil·la el preu; el drawdown és la caiguda des d'un màxim fins al mínim següent.</p>
+          <p>Les accions són volàtils: l'S&amp;P 500 va caure un 37% el 2008, i el Nasdaq 100 va perdre al voltant d'un 75% entre el 2000 i el 2002, i va trigar uns 15 anys a recuperar el màxim. Una pèrdua necessita una pujada més gran per recuperar-se: si perds un 50%, necessites un +100% per tornar on eres.</p>
+          <a class="try" href="index.html?sel=ndx,spx&start=2000&end=2016&log=1">Mira la caiguda de les puntcom →</a>
+        </article>
+
+        <article class="concept" id="horitzo">
+          <h3>Horitzó temporal <span class="en">time horizon</span></h3>
+          <p class="def">L'horitzó és el temps que pots deixar els diners invertits sense necessitar-los.</p>
+          <p>A curt termini la borsa és imprevisible; a llarg termini, històricament, els índexs amplis han tendit a créixer. Per això els diners que necessitaràs en pocs anys (l'entrada d'un pis, un fons d'emergència) no haurien d'estar en accions: si el mercat cau just quan els necessites, hauràs de vendre amb pèrdues.</p>
+        </article>
+
+        <article class="concept" id="dca">
+          <h3>Aportacions periòdiques <span class="en">DCA · Dollar Cost Averaging</span></h3>
+          <p class="def">Invertir la mateixa quantitat cada mes, sigui quin sigui el preu, en lloc d'intentar encertar el moment.</p>
+          <p>És l'estratègia <em>Dollar Cost Averaging</em>. Quan el preu és alt compres menys participacions, i quan és baix, més. Elimina la pressió de decidir quan entrar i converteix l'estalvi en un hàbit. Si ja tens una suma gran, estadísticament invertir-la de cop sol rendir una mica més, però el DCA redueix el risc d'entrar just abans d'una caiguda.</p>
+          <p class="ex"><b>Exemple</b>200 € al mes durant 20 anys són 48.000 € aportats. Amb un 7% anual, al final en tindries uns <span class="num">104.000 €</span>.</p>
+          <a class="try" href="index.html?sel=msci,spx&dca=1&initial=0&monthly=200&start=2006&end=2026">Prova el DCA a la calculadora →</a>
+        </article>
+
+        <article class="concept" id="divisa">
+          <h3>Risc de divisa <span class="en">currency risk</span></h3>
+          <p class="def">Si inverteixes en actius en dòlars, el teu resultat en euros també depèn de com es mogui el canvi euro/dòlar.</p>
+          <p>Si el dòlar es debilita davant l'euro, perds part del guany en convertir-lo, encara que l'actiu hagi pujat. Si s'enforteix, guanyes més. Entre el 2002 i el 2007 l'euro va passar d'1,05 a 1,46 dòlars, cosa que va retallar molt el guany de l'S&amp;P 500 per a un inversor europeu. Alguns ETFs ofereixen versions <em>cobertes</em> (<em>EUR hedged</em>) que neutralitzen aquest efecte, amb un cost.</p>
+          <a class="try" href="index.html?sel=spx&start=2002&end=2007">Activa i desactiva l'efecte del canvi →</a>
+        </article>
+
+        <article class="concept" id="inflacio">
+          <h3>Inflació</h3>
+          <p class="def">La inflació és la pujada general dels preus, que fa que cada euro compri menys amb el temps.</p>
+          <p>Amb una inflació del 2% anual, en uns 35 anys els preus es dupliquen. Tenir els diners quiets al compte corrent és una pèrdua segura de poder adquisitiu. Per saber si una inversió t'ha fet realment més ric, cal mirar la rendibilitat <em>real</em> (<em>real return</em>): la rendibilitat menys la inflació. A Espanya, el 2021 i el 2022 la inflació va superar el 5%.</p>
+          <a class="try" href="index.html?sel=ibex,msci&start=2007&end=2026&inf=1">Mira-ho en euros d'avui →</a>
+        </article>
+
+        <article class="concept wide" id="comissions">
+          <h3>El pes de les comissions <span class="en">fees</span></h3>
+          <p class="def">Una diferència petita de comissió anual es converteix en una diferència enorme al cap de molts anys.</p>
+          <p>La comissió es cobra cada any sobre tot el capital, també sobre els guanys acumulats, de manera que també es compon.</p>
+          <div class="tablewrap">
+            <table>
+              <thead><tr><th>10.000 € durant 30 anys, mercat al 7% anual</th><th class="r">Rendibilitat neta</th><th class="r">Capital final</th></tr></thead>
+              <tbody>
+                <tr><td>Sense comissions</td><td class="r">7,0%</td><td class="r">76.100 €</td></tr>
+                <tr><td>ETF o fons indexat (TER 0,2%)</td><td class="r">6,8%</td><td class="r">72.000 €</td></tr>
+                <tr><td>Fons actiu típic (1,8%)</td><td class="r">5,2%</td><td class="r neg">45.800 €</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>Amb la mateixa evolució del mercat, la comissió del fons actiu s'emporta més de 26.000 €: un terç del resultat.</p>
+        </article>
+
+      </div>
+    </div>
+  </details>
+
+  <!-- ============ VI ============ -->
+  <details class="cap" id="c6">
+    <summary><span class="n">VI</span><h2>Impostos a Espanya</h2><span class="tog" aria-hidden="true">+</span></summary>
+    <div class="capbody">
+      <p class="intro">Els guanys de les inversions tributen a l'IRPF, però no tots igual ni en el mateix moment. Conèixer quatre regles bàsiques et pot estalviar molts diners de manera totalment legal. (Normativa vigent el 2026 per a residents fiscals a Espanya.)</p>
+      <div class="cards">
+
+        <article class="concept wide" id="irpf">
+          <h3>La base de l'estalvi de l'IRPF</h3>
+          <p class="def">Els guanys de vendre inversions, els dividends i els interessos tributen en una escala pròpia, separada del sou.</p>
+          <p>Només pagues per la <strong>plusvàlua quan vens</strong> (<em>capital gain</em>) (la diferència entre el preu de venda i el de compra, descomptant comissions), no mentre les accions pugen. Els dividends i els interessos tributen l'any que els cobres, amb una retenció del 19% que el broker o el banc aplica directament.</p>
+          <div class="tablewrap">
+            <table>
+              <thead><tr><th>Tram de guany</th><th class="r">Tipus</th></tr></thead>
+              <tbody>
+                <tr><td>Fins a 6.000 €</td><td class="r">19%</td></tr>
+                <tr><td>De 6.000 a 50.000 €</td><td class="r">21%</td></tr>
+                <tr><td>De 50.000 a 200.000 €</td><td class="r">23%</td></tr>
+                <tr><td>De 200.000 a 300.000 €</td><td class="r">27%</td></tr>
+                <tr><td>Més de 300.000 €</td><td class="r">30%</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="ex"><b>Exemple</b>Vens amb un guany de 10.000 €: pagues 6.000 × 19% + 4.000 × 21% = <span class="num">1.980 €</span>. Cada tram només s'aplica a la part del guany que hi cau.</p>
+          <a class="try" href="index.html?sel=msci&start=2010&end=2026&net=1">Mira el net a la calculadora →</a>
+        </article>
+
+        <article class="concept" id="perdues">
+          <h3>Compensar pèrdues</h3>
+          <p class="def">Les pèrdues de vendre inversions es resten dels guanys, i així pagues menys impostos.</p>
+          <p>Primer es compensen guanys i pèrdues de vendes del mateix any. Si el saldo és negatiu, es pot restar fins al 25% dels dividends i interessos d'aquell any, i el que sobri es pot compensar durant els <strong>quatre anys següents</strong>. Per això alguns inversors venen posicions amb pèrdues a final d'any per compensar guanys, una pràctica que en anglès es coneix com a <em>tax-loss harvesting</em>.</p>
+        </article>
+
+        <article class="concept" id="dos-mesos">
+          <h3>La regla dels dos mesos</h3>
+          <p class="def">Si vens amb pèrdues i recompres el mateix valor en els dos mesos anteriors o posteriors, no et pots restar la pèrdua fins que vens aquelles noves accions.</p>
+          <p>Evita que es vengui i es recompri al moment només per reduir impostos; és l'equivalent de la <em>wash sale rule</em> dels Estats Units. Per als valors no cotitzats el termini és d'un any. A més, quan vens una part d'una posició comprada en diverses vegades, Hisenda considera que vens primer les més antigues (criteri <em>FIFO</em>).</p>
+        </article>
+
+        <article class="concept" id="traspassos">
+          <h3>Traspassos entre fons</h3>
+          <p class="def">Pots moure els diners d'un fons d'inversió a un altre sense pagar impostos fins que els retiris definitivament.</p>
+          <p>És un dels grans avantatges dels fons a Espanya: pots canviar d'estratègia o de gestora i ajornar la tributació, i els diners que haurien anat a Hisenda continuen invertits. Els <strong>ETFs no hi tenen dret</strong> per als particulars: vendre un ETF per comprar-ne un altre tributa.</p>
+        </article>
+
+        <article class="concept" id="doble-imposicio">
+          <h3>Dividends estrangers i obligacions informatives</h3>
+          <p class="def">Els dividends d'empreses d'altres països sovint tributen dues vegades: al país d'origen i a Espanya.</p>
+          <p>Per exemple, els Estats Units retenen un 15% (si has signat el formulari W-8BEN amb el broker) i després Espanya hi aplica el 19%. A la declaració de la renda pots recuperar part d'aquesta doble imposició, amb límits. A més, si tens més de 50.000 € en valors dipositats en un broker estranger, has de presentar una declaració informativa (model 720), i per a les criptomonedes a l'estranger hi ha el model 721.</p>
+        </article>
+
+      </div>
+      <p class="intro" style="font-size:13.5px;color:var(--muted)">Aquest capítol és un resum general. La normativa fiscal canvia i té excepcions; per a decisions concretes, consulta un assessor fiscal o la informació de l'Agència Tributària.</p>
+    </div>
+  </details>
+
+  <!-- ============ VII ============ -->
+  <details class="cap" id="c7">
+    <summary><span class="n">VII</span><h2>Glossari de la A a la Z</h2><span class="tog" aria-hidden="true">+</span></summary>
+    <div class="capbody">
+      <dl class="gloss">
+        <div><dt><a href="#accio">Acció</a> <span class="en">share · stock</span></dt><dd>Part de la propietat d'una empresa.</dd></div>
+        <div><dt><a href="#acumulacio">Acumulació (Acc)</a> <span class="en">accumulating</span></dt><dd>Fons o ETF que reinverteix els dividends automàticament.</dd></div>
+        <div><dt><a href="#apalancament">Apalancament</a> <span class="en">leverage</span></dt><dd>Invertir amb diners prestats per controlar una posició més gran que el teu capital.</dd></div>
+        <div><dt><a href="#spread">Ask</a></dt><dd>Preu més baix al qual algú està disposat a vendre.</dd></div>
+        <div><dt><a href="#spread">Bid</a></dt><dd>Preu més alt que algú està disposat a pagar.</dd></div>
+        <div><dt><a href="#bo">Bo</a> <span class="en">bond</span></dt><dd>Préstec a un estat o una empresa a canvi d'interessos.</dd></div>
+        <div><dt><a href="#borsa">Borsa</a> <span class="en">stock exchange</span></dt><dd>Mercat organitzat on es compren i venen valors.</dd></div>
+        <div><dt><a href="#broker">Broker</a></dt><dd>Intermediari que executa les teves ordres al mercat.</dd></div>
+        <div><dt><a href="#capitalitzacio">Capitalització</a> <span class="en">market cap</span></dt><dd>Preu de l'acció × nombre d'accions: el valor de l'empresa a borsa.</dd></div>
+        <div><dt><a href="#cfd">CFD</a> <span class="en">Contract for Difference</span></dt><dd>Contracte per apostar sobre el preu d'un actiu sense tenir-lo, amb apalancament.</dd></div>
+        <div><dt><a href="#compte-marge">Compte de marge</a> <span class="en">margin account</span></dt><dd>Compte en què el broker et presta diners amb les teves inversions com a garantia.</dd></div>
+        <div><dt><a href="#dca">DCA</a> <span class="en">Dollar Cost Averaging</span></dt><dd>Invertir la mateixa quantitat de manera periòdica, sigui quin sigui el preu.</dd></div>
+        <div><dt><a href="#acumulacio">Distribució (Dist)</a> <span class="en">distributing</span></dt><dd>Fons o ETF que paga els dividends al compte de l'inversor.</dd></div>
+        <div><dt><a href="#diversificacio">Diversificació</a> <span class="en">diversification</span></dt><dd>Repartir la inversió per reduir el risc d'un sol valor.</dd></div>
+        <div><dt><a href="#dividend">Dividend</a></dt><dd>Part dels beneficis que l'empresa reparteix entre els accionistes.</dd></div>
+        <div><dt><a href="#volatilitat">Drawdown</a></dt><dd>Caiguda des d'un màxim fins al mínim posterior.</dd></div>
+        <div><dt><a href="#etf">ETF</a> <span class="en">Exchange Traded Fund</span></dt><dd>Fons cotitzat: un fons que es compra i es ven a borsa com una acció.</dd></div>
+        <div><dt><a href="#fons">Fons d'inversió</a> <span class="en">mutual fund</span></dt><dd>Cartera gestionada que reuneix els diners de molts inversors.</dd></div>
+        <div><dt><a href="#fons-indexat">Fons indexat</a> <span class="en">index fund</span></dt><dd>Fons de gestió passiva que copia un índex.</dd></div>
+        <div><dt><a href="#futurs">Futur</a> <span class="en">future</span></dt><dd>Compromís de comprar o vendre un actiu en una data futura a un preu fixat avui.</dd></div>
+        <div><dt><a href="#slippage">Gap</a></dt><dd>Salt de preu entre un tancament i la següent obertura.</dd></div>
+        <div><dt><a href="#index">Índex</a> <span class="en">index</span></dt><dd>Indicador que resumeix l'evolució d'un grup d'accions.</dd></div>
+        <div><dt><a href="#inflacio">Inflació</a> <span class="en">inflation</span></dt><dd>Pujada general dels preus que redueix el poder adquisitiu.</dd></div>
+        <div><dt><a href="#interes-compost">Interès compost</a> <span class="en">compound interest</span></dt><dd>Guanyar rendiments sobre els rendiments anteriors.</dd></div>
+        <div><dt><a href="#venda-curt">Long</a> <span class="en">anar llarg</span></dt><dd>Tenir una posició que guanya si el preu puja.</dd></div>
+        <div><dt><a href="#crida-marge">Margin call</a> <span class="en">crida de marge</span></dt><dd>Avís que has d'aportar diners perquè la garantia ha baixat del mínim.</dd></div>
+        <div><dt><a href="#etf">Market maker</a> <span class="en">creador de mercat</span></dt><dd>Intermediari que dona preus de compra i venda i aporta liquiditat.</dd></div>
+        <div><dt><a href="#borsa">OPV</a> <span class="en">IPO</span></dt><dd>Sortida a borsa d'una empresa.</dd></div>
+        <div><dt><a href="#futurs">Opció</a> <span class="en">option · call · put</span></dt><dd>Dret, no obligació, de comprar (call) o vendre (put) a un preu fixat.</dd></div>
+        <div><dt><a href="#ordre-mercat">Ordre a mercat</a> <span class="en">market order</span></dt><dd>S'executa a l'instant al millor preu disponible.</dd></div>
+        <div><dt><a href="#ordre-limit">Ordre límit</a> <span class="en">limit order</span></dt><dd>S'executa només al preu fixat o a un de millor.</dd></div>
+        <div><dt><a href="#irpf">Plusvàlua</a> <span class="en">capital gain</span></dt><dd>Guany obtingut en vendre una inversió per sobre del preu de compra.</dd></div>
+        <div><dt><a href="#replicacio">Replicació</a> <span class="en">replication</span></dt><dd>Mètode amb què un fons copia el seu índex: física o sintètica.</dd></div>
+        <div><dt><a href="#venda-curt">Short</a> <span class="en">anar curt</span></dt><dd>Tenir una posició que guanya si el preu baixa.</dd></div>
+        <div><dt><a href="#venda-curt">Short squeeze</a></dt><dd>Pujada brusca provocada per inversors en curt que recompren alhora.</dd></div>
+        <div><dt><a href="#slippage">Slippage</a> <span class="en">lliscament</span></dt><dd>Diferència entre el preu esperat i el preu real d'execució.</dd></div>
+        <div><dt><a href="#spread">Spread</a> <span class="en">diferencial</span></dt><dd>Diferència entre el preu bid i el preu ask.</dd></div>
+        <div><dt><a href="#stop-loss">Stop loss</a> <span class="en">aturada de pèrdues</span></dt><dd>Ordre que ven automàticament si el preu cau fins a un nivell.</dd></div>
+        <div><dt><a href="#ter">TER</a> <span class="en">Total Expense Ratio</span></dt><dd>Comissió anual total d'un fons o ETF.</dd></div>
+        <div><dt><a href="#ter">Tracking error</a></dt><dd>Com se separa un fons de l'índex que copia.</dd></div>
+        <div><dt><a href="#trailing-stop">Trailing stop</a> <span class="en">stop dinàmic</span></dt><dd>Stop loss que puja seguint el preu i no baixa mai.</dd></div>
+        <div><dt><a href="#traspassos">Traspàs</a></dt><dd>Moure diners entre fons sense pagar impostos (avantatge propi d'Espanya).</dd></div>
+        <div><dt><a href="#ter">UCITS</a></dt><dd>Normativa europea de protecció per a fons i ETFs.</dd></div>
+        <div><dt><a href="#fons">Valor liquidatiu</a> <span class="en">NAV</span></dt><dd>Preu diari d'una participació d'un fons.</dd></div>
+        <div><dt><a href="#venda-curt">Venda en curt</a> <span class="en">short selling</span></dt><dd>Vendre accions prestades per recomprar-les més barates.</dd></div>
+        <div><dt><a href="#volatilitat">Volatilitat</a> <span class="en">volatility</span></dt><dd>Intensitat amb què oscil·la el preu d'un actiu.</dd></div>
+      </dl>
+    </div>
+  </details>
+
+  <footer>
+    <p><strong>Avís.</strong> Aquest contingut és divulgatiu i educatiu. No és assessorament financer ni una recomanació de comprar o vendre cap producte. Les xifres dels exemples són il·lustratives i la rendibilitat passada no garanteix la futura. Abans d'invertir, assegura't d'entendre el producte i el risc que assumeixes.</p>
+    <p><a href="index.html">← Torna a la calculadora</a></p>
+  </footer>
+</div>
+
+<script>
+(function(){
+  const caps=[...document.querySelectorAll('details.cap')];
+  function reveal(hash){
+    if(!hash||hash.length<2) return;
+    const el=document.getElementById(decodeURIComponent(hash.slice(1)));
+    if(!el) return;
+    const d=el.closest('details.cap'); if(d && !d.open) d.open=true;
+    requestAnimationFrame(()=>el.scrollIntoView({block:'start'}));
+  }
+  document.addEventListener('click',e=>{
+    const a=e.target.closest('a[href^="#"]'); if(!a) return;
+    const h=a.getAttribute('href'); if(h.length<2) return;
+    e.preventDefault(); history.pushState(null,'',h); reveal(h);
+  });
+  window.addEventListener('hashchange',()=>reveal(location.hash));
+  reveal(location.hash);
+  document.getElementById('open-all').onclick=()=>caps.forEach(d=>d.open=true);
+  document.getElementById('close-all').onclick=()=>caps.forEach(d=>d.open=false);
+})();
+</script>
+</body>
+</html>

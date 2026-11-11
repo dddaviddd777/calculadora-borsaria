@@ -40,6 +40,12 @@ h1{font-family:var(--f-display);font-weight:700;font-size:clamp(30px,5vw,50px);l
 .sub{font-style:italic}
 .sub{color:var(--muted);margin:6px 0 0;max-width:60ch}
 .stamp{font-family:var(--f-mono);font-size:12px;color:var(--muted);border:1px solid var(--ink);border-radius:0;padding:6px 10px;background:transparent;text-transform:uppercase;letter-spacing:.06em}
+.hdr-side{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+@media (max-width:600px){.hdr-side{align-items:flex-start}}
+.navlink{font-family:var(--f-display);font-weight:700;font-size:15px;letter-spacing:.06em;color:var(--accent-ink);background:var(--accent);text-decoration:none;padding:7px 12px;border-radius:2px}
+.navlink span{font-family:var(--f-body);font-weight:400;font-style:italic;letter-spacing:0}
+.navlink:hover{filter:brightness(1.1)}
+.navlink:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .grid{display:grid;grid-template-columns:330px minmax(0,1fr);gap:20px;align-items:start}
 @media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}}
 .panel{background:var(--surface);border:1px solid var(--line);border-radius:2px;box-shadow:0 1px 0 var(--line), 0 6px 18px -12px rgba(60,35,10,.45);padding:18px;display:flex;flex-direction:column;gap:18px}
@@ -104,7 +110,10 @@ td .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right
       <h1>Màquina del Temps Borsària</h1>
       <p class="sub">Què hauria passat si haguessis invertit abans, i què podria passar si inverteixes ara. Tria índexs o accions, compara'ls i allarga la història cap al futur.</p>
     </div>
-    <div class="stamp">Dades fins a finals d'octubre de 2026</div>
+    <div class="hdr-side">
+      <a class="navlink" href="apren.html">Aprèn <span>· Suplement per a l'inversor →</span></a>
+      <div class="stamp">Dades fins a finals d'octubre de 2026</div>
+    </div>
   </header>
 
   <div class="grid">
@@ -469,7 +478,19 @@ function render(){
   chart = new Chart($('chart'), cfg);
 }
 
-buildChips(); buildSelects(); bind(); render();
+// Configuració inicial des de l'adreça (enllaços «Prova-ho» de apren.html), p. ex. ?sel=msci,spx&dca=1&start=2006&end=2026
+function readParams(){
+  const p=new URLSearchParams(location.search);
+  if(p.has('sel')){ const ids=p.get('sel').split(',').filter(id=>ASSETS.some(a=>a.id===id)); if(ids.length) state.sel=new Set(ids); }
+  if(p.has('dca')) state.dca=p.get('dca')==='1';
+  for(const k of ['initial','monthly']) if(p.has(k)){ const v=+p.get(k); if(Number.isFinite(v)&&v>=0){ state[k]=v; $(k).value=v; } }
+  if(p.has('start')){ const v=p.get('start'); if(v==='now') state.start='now'; else { const y=+v; if(Number.isInteger(y)&&y>=T0&&y<=2026) state.start=y; } }
+  if(p.has('end')){ const y=+p.get('end'); if(Number.isInteger(y)&&y>=T0&&y<=LAST_YEAR) state.end=y; }
+  for(const [k,id] of [['div','opt-div'],['fx','opt-fx'],['inf','opt-inf'],['net','opt-net'],['log','opt-log']])
+    if(p.has(k)){ state[k]=p.get(k)==='1'; $(id).checked=state[k]; }
+}
+
+readParams(); buildChips(); buildSelects(); bind(); render();
 const mq=window.matchMedia('(prefers-color-scheme: dark)');
 if (mq.addEventListener) mq.addEventListener('change',render);
 new MutationObserver(render).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
