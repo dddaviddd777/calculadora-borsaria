@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Màquina del Temps Borsària</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: columna de controls a l'esquerra (sticky), gràfica i resultats a la dreta; en mòbil, tot apilat */
+:root{
+  --bg:#E6D3A8; --surface:#F1E3BF; --ink:#2B1D0E; --muted:#6E5634; --line:#BFA372; --soft:#E2CB98;
+  --accent:#8A4A12; --accent-ink:#F6EBCF; --good:#4E6B1F; --bad:#9B2C1A;
+  --c1:#8A4A12; --c2:#7A2232; --c3:#4E6B1F; --c4:#B9822A; --c5:#A8361F;
+  --c6:#3B3226; --c7:#2F5E68; --c8:#6F7A2A; --c9:#C2621E; --c10:#6B3F6E;
+  --f-display:"Old Standard TT", "Times New Roman", Georgia, serif;
+  --f-body:"Libre Caslon Text", Georgia, "Times New Roman", serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#1E170E; --surface:#2A2014; --ink:#EBDCB8; --muted:#B39C74; --line:#4A3A24; --soft:#33281A;
+  --accent:#E0A050; --accent-ink:#1E170E; --good:#A9BF6A; --bad:#E77A5F;
+  --c1:#E0A050; --c2:#D9768A; --c3:#A9BF6A; --c4:#F0CD7A; --c5:#E77A5F;
+  --c6:#D6C7A6; --c7:#7FB3BD; --c8:#C9C46A; --c9:#F09A55; --c10:#B993BC;
+  color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#1E170E; --surface:#2A2014; --ink:#EBDCB8; --muted:#B39C74; --line:#4A3A24; --soft:#33281A;
+  --accent:#E0A050; --accent-ink:#1E170E; --good:#A9BF6A; --bad:#E77A5F;
+  --c1:#E0A050; --c2:#D9768A; --c3:#A9BF6A; --c4:#F0CD7A; --c5:#E77A5F;
+  --c6:#D6C7A6; --c7:#7FB3BD; --c8:#C9C46A; --c9:#F09A55; --c10:#B993BC;
+  color-scheme:dark }
+body{background-image:radial-gradient(ellipse at center, transparent 55%, var(--soft) 100%);background-attachment:fixed}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:24px 40px}
+.wrap{max-width:1240px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+header{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:12px;border-top:4px double var(--ink);border-bottom:1px solid var(--ink);padding-block:14px 12px}
+h1{font-family:var(--f-display);font-weight:700;font-size:clamp(30px,5vw,50px);line-height:1;margin:0;letter-spacing:-.005em;text-wrap:balance}
+.sub{font-style:italic}
+.sub{color:var(--muted);margin:6px 0 0;max-width:60ch}
+.stamp{font-family:var(--f-mono);font-size:12px;color:var(--muted);border:1px solid var(--ink);border-radius:0;padding:6px 10px;background:transparent;text-transform:uppercase;letter-spacing:.06em}
+.grid{display:grid;grid-template-columns:330px minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:2px;box-shadow:0 1px 0 var(--line), 0 6px 18px -12px rgba(60,35,10,.45);padding:18px;display:flex;flex-direction:column;gap:18px}
+aside.panel{position:sticky;top:max(12px, env(safe-area-inset-top, 0px))}
+@media (max-width:900px){aside.panel{position:static}}
+.group{display:flex;flex-direction:column;gap:8px}
+.label{font-family:var(--f-display);font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);border-bottom:1px solid var(--line);padding-bottom:4px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--bg);color:var(--ink);
+  border-radius:999px;padding:5px 11px 5px 9px;font:500 13px var(--f-body);cursor:pointer}
+.chip .dot{width:9px;height:9px;border-radius:50%;background:var(--muted);opacity:.35}
+.chip[aria-pressed="true"]{background:var(--soft);border-color:var(--dotc)}
+.chip[aria-pressed="true"] .dot{background:var(--dotc);opacity:1}
+.chip:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row > *{flex:1 1 120px;min-width:0}
+.field{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted)}
+input[type=number],select{width:100%;font:500 15px var(--f-mono);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:2px;padding:8px 10px}
+.seg{display:flex;border:1px solid var(--ink);border-radius:2px;overflow:hidden}
+.seg button{flex:1;border:0;background:var(--bg);color:var(--ink);font:500 13px var(--f-body);padding:8px 6px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.presets{display:flex;flex-wrap:wrap;gap:6px}
+.presets button{border:1px dashed var(--line);background:transparent;color:var(--ink);border-radius:6px;font:500 12.5px var(--f-body);padding:5px 9px;cursor:pointer}
+.presets button:hover{border-color:var(--accent);color:var(--accent)}
+.toggle{display:flex;align-items:flex-start;gap:10px;font-size:14px;cursor:pointer}
+.toggle input{margin-top:3px;accent-color:var(--accent);width:16px;height:16px;flex:none}
+.toggle small{display:block;color:var(--muted);font-size:12.5px;line-height:1.35}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.rangeval{font-family:var(--f-mono);color:var(--ink)}
+.hint{font-size:12.5px;color:var(--muted);margin:0}
+.headline{font-family:var(--f-display);font-weight:400;font-size:clamp(20px,2.6vw,28px);line-height:1.25;margin:0;text-wrap:balance;border-bottom:1px solid var(--line);padding-bottom:14px}
+.headline strong{font-weight:700;color:var(--accent)}
+.headline .range{display:block;font-family:var(--f-body);font-size:14px;color:var(--muted);margin-top:6px;font-weight:400}
+.chartbox{position:relative;height:clamp(300px,48vh,460px)}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12.5px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.ln{width:22px;height:0;border-top:2px solid var(--ink)}
+.ln.dash{border-top-style:dashed}
+.ln.grey{border-top:2px dotted var(--muted)}
+.band{width:18px;height:10px;background:var(--soft);border:1px solid var(--line)}
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:640px}
+th{font-family:var(--f-display);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink);font-weight:700;text-align:right;padding:8px 10px;border-top:2px solid var(--ink);border-bottom:1px solid var(--ink);white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+td{padding:10px;border-bottom:1px solid var(--line);text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+td:first-child{font-family:var(--f-body);font-weight:500}
+td .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:8px;vertical-align:1px}
+.pos{color:var(--good)} .neg{color:var(--bad)}
+.na{color:var(--muted);font-family:var(--f-body);font-size:13px}
+.notes{font-size:12.5px;color:var(--muted);line-height:1.6;max-width:90ch;columns:2 300px;column-gap:28px;column-rule:1px solid var(--line)}
+.notes p{break-inside:avoid}
+.notes p{margin:0 0 6px}
+.err{color:var(--bad);font-size:14px;margin:0}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Màquina del Temps Borsària</h1>
+      <p class="sub">Què hauria passat si haguessis invertit abans, i què podria passar si inverteixes ara. Tria índexs o accions, compara'ls i allarga la història cap al futur.</p>
+    </div>
+    <div class="stamp">Dades fins a finals d'octubre de 2026</div>
+  </header>
+
+  <div class="grid">
+    <aside class="panel" aria-label="Controls">
+      <div class="group">
+        <span class="label">Índexs</span>
+        <div class="chips" id="chips-idx"></div>
+        <span class="label" style="margin-top:6px">Accions</span>
+        <div class="chips" id="chips-stk"></div>
+      </div>
+
+      <div class="group">
+        <span class="label">Aportacions</span>
+        <div class="seg" role="group" aria-label="Tipus d'aportació">
+          <button type="button" id="mode-single" aria-pressed="true">Única</button>
+          <button type="button" id="mode-dca" aria-pressed="false">Única + mensual</button>
+        </div>
+        <div class="row">
+          <label class="field">Inicial (€)<input type="number" id="initial" min="0" step="100" value="1000"></label>
+          <label class="field" id="monthly-wrap" hidden>Cada mes (€)<input type="number" id="monthly" min="0" step="10" value="100"></label>
+        </div>
+      </div>
+
+      <div class="group">
+        <span class="label">Període</span>
+        <div class="row">
+          <label class="field">Des de<select id="start"></select></label>
+          <label class="field">Fins a<select id="end"></select></label>
+        </div>
+        <div class="presets">
+          <button type="button" data-p="past10">Fa 10 anys → avui</button>
+          <button type="button" data-p="fut10">Avui → 2036</button>
+          <button type="button" data-p="both">2016 → 2036</button>
+        </div>
+      </div>
+
+      <div class="group">
+        <span class="label">Projecció a futur</span>
+        <label class="field">Ritme basat en els últims
+          <select id="lookback">
+            <option value="5">5 anys</option>
+            <option value="10" selected>10 anys</option>
+            <option value="15">15 anys</option>
+            <option value="20">20 anys</option>
+          </select>
+        </label>
+        <label class="field">Marge dels escenaris: <span class="rangeval" id="spread-val">±3 punts</span>
+          <input type="range" id="spread" min="0" max="8" step="0.5" value="3">
+        </label>
+        <label class="field">Rendibilitat manual (% anual, opcional)
+          <input type="number" id="manual" step="0.5" placeholder="Automàtica">
+        </label>
+        <p class="hint">Si escrius un valor, tots els actius es projecten amb aquest percentatge.</p>
+      </div>
+
+      <div class="group">
+        <span class="label">Opcions</span>
+        <label class="toggle"><input type="checkbox" id="opt-div" checked><span>Dividends reinvertits<small>Desactivat: només el preu de l'actiu.</small></span></label>
+        <label class="toggle"><input type="checkbox" id="opt-fx" checked><span>Efecte del canvi euro/dòlar<small>Els actius en dòlars es calculen tal com els notaria un inversor en euros.</small></span></label>
+        <label class="toggle"><input type="checkbox" id="opt-inf"><span>En euros d'avui<small>Descompta la inflació espanyola (2% anual al futur).</small></span></label>
+        <label class="toggle"><input type="checkbox" id="opt-net"><span>Mostrar el net després d'impostos<small>IRPF de l'estalvi en vendre: del 19% al 30% sobre el guany.</small></span></label>
+        <label class="toggle"><input type="checkbox" id="opt-log"><span>Escala logarítmica<small>Útil per comparar actius que creixen molt diferent.</small></span></label>
+      </div>
+    </aside>
+
+    <main class="panel">
+      <p class="headline" id="headline"></p>
+      <p class="err" id="err" hidden></p>
+      <div class="chartbox"><canvas id="chart" aria-label="Gràfica d'evolució de la inversió"></canvas></div>
+      <div class="legend">
+        <span><i class="ln"></i>Dades reals</span>
+        <span><i class="ln dash"></i>Projecció (escenari mitjà)</span>
+        <span id="lg-band"><i class="band"></i>Entre pessimista i optimista</span>
+        <span><i class="ln grey"></i>Diners aportats</span>
+      </div>
+      <div class="tablewrap">
+        <table>
+          <thead><tr id="thead"></tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+      <div class="notes">
+        <p><strong>Com es calcula.</strong> Es fan servir les rendibilitats anuals de cada actiu, repartides mes a mes. Els índexs americans i el MSCI World inclouen dividends reinvertits; per als índexs europeus i les accions s'afegeix un dividend mitjà aproximat. El 2026 compta fins a finals d'octubre. La projecció aplica la rendibilitat anual mitjana del període que triïs; els escenaris pessimista i optimista resten i sumen el marge.</p>
+        <p><strong>Precisió.</strong> Les xifres són aproximades i serveixen per fer-se una idea, no per a decisions d'inversió. Les dades de 2026 del Nasdaq 100, l'Euro Stoxx 50, Apple i Amazon són estimacions a partir de notícies de mercat. No s'inclouen les comissions dels fons ni dels brokers. La rendibilitat passada no garanteix la futura.</p>
+        <p><strong>Impostos.</strong> El net aplica els trams de l'IRPF de l'estalvi de 2026 sobre el guany total, com si vengués tot el darrer dia. No té en compte la retenció anual sobre dividends.</p>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+<script>
+(function(){
+const T0 = 2000;
+const TM = (2026 - T0) * 12 + 10;           // inici de novembre de 2026 = "avui"
+const TODAY_X = T0 + TM / 12;
+const LAST_YEAR = 2060;
+
+// EUR/USD a final d'any (dòlars per euro); 2026 = actual
+const FX = {1999:1.007,2000:0.94,2001:0.89,2002:1.05,2003:1.26,2004:1.36,2005:1.18,2006:1.32,2007:1.46,2008:1.40,2009:1.43,2010:1.34,2011:1.30,2012:1.32,2013:1.38,2014:1.21,2015:1.09,2016:1.05,2017:1.20,2018:1.15,2019:1.12,2020:1.22,2021:1.14,2022:1.07,2023:1.10,2024:1.04,2025:1.17,2026:1.127};
+// IPC d'Espanya (desembre, %), 2000–2026
+const CPI = [4.0,2.7,4.0,2.6,3.2,3.7,2.7,4.2,1.4,0.8,3.0,2.4,2.9,0.3,-1.0,0.0,1.6,1.1,1.2,0.8,-0.5,6.5,5.7,3.1,2.8,2.9,3.0];
+const CPI_FUT = 2.0;
+
+// kind 'tr' = rendibilitat total (amb dividends); 'price' = només preu. div = dividend anual aproximat (%)
+const ASSETS = [
+ {id:'spx', name:'S&P 500', group:'idx', cur:'USD', kind:'tr', div:1.7, from:2000, c:'--c1',
+  d:[-9.1,-11.9,-22.1,28.7,10.9,4.9,15.8,5.5,-37.0,26.5,15.1,2.1,16.0,32.4,13.7,1.4,12.0,21.8,-4.4,31.5,18.4,28.7,-18.1,26.3,25.0,17.9,11.8]},
+ {id:'ndx', name:'Nasdaq 100', group:'idx', cur:'USD', kind:'tr', div:0.8, from:2000, c:'--c2',
+  d:[-36.8,-32.6,-37.5,49.7,10.7,1.9,7.3,19.2,-41.6,54.7,20.1,3.7,18.4,36.9,19.4,9.8,7.3,33.0,-0.1,39.5,48.9,27.5,-32.4,55.1,25.9,21.0,11.0]},
+ {id:'msci', name:'MSCI World', group:'idx', cur:'USD', kind:'tr', div:2.0, from:2000, c:'--c3',
+  d:[-13.2,-16.8,-19.9,33.1,14.7,9.5,20.1,9.0,-40.7,30.0,11.8,-5.5,15.8,26.7,4.9,-0.9,7.5,22.4,-8.7,27.7,15.9,21.8,-18.1,23.8,18.7,21.1,13.1]},
+ {id:'sx5e', name:'Euro Stoxx 50', group:'idx', cur:'EUR', kind:'price', div:3.2, from:2000, c:'--c4',
+  d:[-2.7,-20.1,-37.3,15.7,6.9,21.3,15.1,6.8,-44.4,21.1,-5.8,-17.1,13.8,17.9,1.2,3.8,0.7,6.5,-14.3,24.8,-5.1,21.0,-11.7,19.2,8.3,18.3,7.0]},
+ {id:'ibex', name:'IBEX 35', group:'idx', cur:'EUR', kind:'price', div:3.8, from:2000, c:'--c5',
+  d:[-21.7,-7.8,-28.1,28.2,17.4,18.2,31.8,7.3,-39.4,29.8,-17.4,-13.1,-4.7,21.4,3.7,-7.2,-2.0,7.4,-15.0,11.8,-15.5,7.9,-5.6,22.8,14.8,49.3,11.7]},
+ {id:'aapl', name:'Apple', group:'stk', cur:'USD', kind:'price', div:0.6, from:2005, c:'--c6',
+  d:[123.3,18.0,133.5,-56.9,146.9,53.1,25.6,32.6,5.4,37.7,-4.6,10.0,46.1,-5.4,86.2,80.7,33.8,-26.4,48.2,30.7,9.0,15.0]},
+ {id:'msft', name:'Microsoft', group:'stk', cur:'USD', kind:'price', div:1.2, from:2005, c:'--c7',
+  d:[-2.0,15.8,19.2,-45.4,56.8,-8.4,-7.0,2.9,40.1,24.2,19.4,12.0,37.7,18.7,55.3,41.0,51.2,-28.7,56.8,12.1,15.0,-19.0]},
+ {id:'nvda', name:'Nvidia', group:'stk', cur:'USD', kind:'price', div:0.1, from:2005, c:'--c8',
+  d:[55.0,102.4,37.8,-76.3,131.5,-17.5,-10.0,-11.6,30.7,25.2,64.4,223.9,81.3,-31.0,76.3,122.3,125.3,-50.3,239.0,171.2,39.0,9.5]},
+ {id:'amzn', name:'Amazon', group:'stk', cur:'USD', kind:'price', div:0, from:2005, c:'--c9',
+  d:[6.5,-16.3,134.8,-44.6,162.3,33.8,-3.8,44.9,59.0,-22.2,117.8,10.9,56.0,28.4,23.0,76.3,2.4,-49.6,80.9,44.4,5.2,13.0]},
+ {id:'itx', name:'Inditex', group:'stk', cur:'EUR', kind:'price', div:3.0, from:2010, c:'--c10',
+  d:[29,12,68,11,2,34,2,-10,-23,41,-17,10,-13,58,26,14,4.6]},
+];
+
+const state = {
+  sel: new Set(['spx','msci','ibex']),
+  dca:false, initial:1000, monthly:100,
+  start:2016, end:2036, lookback:10, spread:3, manual:null,
+  div:true, fx:true, inf:false, net:false, log:false
+};
+
+const eur = new Intl.NumberFormat('ca-ES',{style:'currency',currency:'EUR',maximumFractionDigits:0});
+const pct = v => (v>=0?'+':'') + new Intl.NumberFormat('ca-ES',{maximumFractionDigits:1,minimumFractionDigits:1}).format(v*100) + '%';
+const pctPlain = v => new Intl.NumberFormat('ca-ES',{maximumFractionDigits:1,minimumFractionDigits:1}).format(v*100) + '%';
+const $ = id => document.getElementById(id);
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function rgba(hex,a){const h=hex.replace('#','');const n=parseInt(h.length===3?h.split('').map(x=>x+x).join(''):h,16);return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`}
+
+// ---------- càlcul ----------
+function yearRet(a,y){
+  const r = a.d[y - a.from] / 100;
+  const months = y === 2026 ? 10 : 12;
+  const dv = a.div/100 * months/12;
+  let tr, pr;
+  if (a.kind === 'tr'){ tr = r; pr = (1+r)/(1+dv) - 1; } else { pr = r; tr = (1+r)*(1+dv) - 1; }
+  let base = state.div ? tr : pr;
+  if (a.cur === 'USD' && state.fx) base = (1+base) * (FX[y-1]/FX[y]) - 1;
+  return Math.pow(1+base, 1/months) - 1;   // rendibilitat mensual
+}
+function histMonth(a,m){ return yearRet(a, T0 + Math.floor(m/12)); }
+const firstM = a => (a.from - T0) * 12;
+
+const cpiIdx = (() => {
+  const arr=[1]; const max=(LAST_YEAR+1-T0)*12;
+  for(let m=0;m<max;m++){
+    const y=T0+Math.floor(m/12);
+    const r = m < TM ? CPI[y-T0] : CPI_FUT;
+    arr.push(arr[m]*Math.pow(1+r/100,1/12));
+  }
+  return arr;
+})();
+const realF = m => state.inf ? cpiIdx[TM]/cpiIdx[m] : 1;
+
+function baseRate(a){
+  if (state.manual !== null) return state.manual/100;
+  const s = Math.max(TM - state.lookback*12, firstM(a));
+  let g=1; for(let m=s;m<TM;m++) g *= 1+histMonth(a,m);
+  return Math.pow(g, 12/(TM-s)) - 1;
+}
+function startM(){ return state.start === 'now' ? TM : (state.start - T0)*12; }
+function endM(){ return state.end === 2026 ? TM : (state.end - T0 + 1)*12; }
+
+function tax(g){
+  if (g<=0) return 0;
+  const br=[[6000,.19],[50000,.21],[200000,.23],[300000,.27],[Infinity,.30]];
+  let t=0, prev=0;
+  for(const [lim,r] of br){ if(g>prev){ t += (Math.min(g,lim)-prev)*r; prev=lim; } }
+  return t;
+}
+
+function simulate(a){
+  const s=startM(), e=endM();
+  if (s < firstM(a)) return {na:true};
+  const R = baseRate(a);
+  const rates = [R, R - state.spread/100, R + state.spread/100];
+  const gm = rates.map(r => Math.pow(1+Math.max(r,-0.99),1/12) - 1);
+  let v=[state.initial,state.initial,state.initial], paid=state.initial;
+  const x0 = T0 + s/12;
+  const pts=[{x:x0,y:v[0]*realF(s)}], lo=[], hi=[], paidPts=[{x:x0,y:paid*realF(s)}];
+  let histEndVal=null, histEndPaid=null;
+  if (s===TM){ lo.push({x:x0,y:v[0]}); hi.push({x:x0,y:v[0]}); }
+  for(let m=s;m<e;m++){
+    if (m>s && state.dca){ for(let i=0;i<3;i++) v[i]+=state.monthly; paid+=state.monthly; }
+    if (m<TM){ const r=histMonth(a,m); for(let i=0;i<3;i++) v[i]*=1+r; }
+    else { for(let i=0;i<3;i++) v[i]*=1+gm[i]; }
+    const x=T0+(m+1)/12, f=realF(m+1);
+    pts.push({x,y:v[0]*f}); paidPts.push({x,y:paid*f});
+    if (m+1===TM){ histEndVal=v[0]; histEndPaid=paid; lo.push({x,y:v[0]*f}); hi.push({x,y:v[0]*f}); }
+    if (m+1>TM){ lo.push({x,y:v[1]*f}); hi.push({x,y:v[2]*f}); }
+  }
+  const fEnd = realF(e);
+  // rendibilitat anual del tram històric (només aportació única, és la més clara)
+  let histCagr=null;
+  if (s<TM){
+    const he=Math.min(e,TM); let g=1;
+    for(let m=s;m<he;m++) g*=1+histMonth(a,m);
+    histCagr = Math.pow(g,12/(he-s))-1;
+  }
+  const gross=v[0], gain=gross-paid, net=gross-tax(gain);
+  return {na:false, R, pts, lo, hi, paidPts, paid, paidReal:paid*fEnd, gross, grossReal:gross*fEnd,
+          lowReal:v[1]*fEnd, highReal:v[2]*fEnd, gain, net, netReal:net*fEnd, histCagr, future:e>TM};
+}
+
+// ---------- interfície ----------
+function buildChips(){
+  for (const a of ASSETS){
+    const b=document.createElement('button');
+    b.type='button'; b.className='chip'; b.id='chip-'+a.id;
+    b.style.setProperty('--dotc', `var(${a.c})`);
+    b.innerHTML=`<span class="dot"></span>${a.name}`;
+    b.setAttribute('aria-pressed', state.sel.has(a.id));
+    b.onclick=()=>{ state.sel.has(a.id)?state.sel.delete(a.id):state.sel.add(a.id); b.setAttribute('aria-pressed',state.sel.has(a.id)); render(); };
+    $(a.group==='idx'?'chips-idx':'chips-stk').appendChild(b);
+  }
+}
+function buildSelects(){
+  const s=$('start'), e=$('end');
+  for(let y=T0;y<=2026;y++) s.add(new Option('gen. '+y, y));
+  s.add(new Option('Avui (nov. 2026)','now'));
+  for(let y=T0;y<=LAST_YEAR;y++) e.add(new Option(y===2026?'Avui (nov. 2026)':'des. '+y, y));
+  syncInputs();
+}
+function syncInputs(){
+  $('start').value=String(state.start); $('end').value=String(state.end);
+  $('mode-single').setAttribute('aria-pressed',!state.dca);
+  $('mode-dca').setAttribute('aria-pressed',state.dca);
+  $('monthly-wrap').hidden=!state.dca;
+}
+function bind(){
+  $('mode-single').onclick=()=>{state.dca=false;syncInputs();render();};
+  $('mode-dca').onclick=()=>{state.dca=true;syncInputs();render();};
+  $('initial').oninput=e=>{state.initial=Math.max(0,+e.target.value||0);render();};
+  $('monthly').oninput=e=>{state.monthly=Math.max(0,+e.target.value||0);render();};
+  $('start').onchange=e=>{state.start=e.target.value==='now'?'now':+e.target.value;render();};
+  $('end').onchange=e=>{state.end=+e.target.value;render();};
+  $('lookback').onchange=e=>{state.lookback=+e.target.value;render();};
+  $('spread').oninput=e=>{state.spread=+e.target.value;$('spread-val').textContent='±'+String(state.spread).replace('.',',')+' punts';render();};
+  $('manual').oninput=e=>{const v=e.target.value.trim();state.manual=v===''?null:+v;render();};
+  for(const [id,k] of [['opt-div','div'],['opt-fx','fx'],['opt-inf','inf'],['opt-net','net'],['opt-log','log']])
+    $(id).onchange=e=>{state[k]=e.target.checked;render();};
+  document.querySelectorAll('.presets button').forEach(b=>b.onclick=()=>{
+    const p=b.dataset.p;
+    if(p==='past10'){state.start=2016;state.end=2026;}
+    if(p==='fut10'){state.start='now';state.end=2036;}
+    if(p==='both'){state.start=2016;state.end=2036;}
+    syncInputs();render();
+  });
+}
+
+let chart=null;
+const todayLine={id:'today',afterDatasetsDraw(c){
+  const xs=c.scales.x; if(TODAY_X<=xs.min||TODAY_X>=xs.max) return;
+  const x=xs.getPixelForValue(TODAY_X), {top,bottom}=c.chartArea, ctx=c.ctx;
+  ctx.save(); ctx.strokeStyle=css('--muted'); ctx.setLineDash([2,3]); ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(x,top); ctx.lineTo(x,bottom); ctx.stroke();
+  ctx.setLineDash([]); ctx.fillStyle=css('--muted'); ctx.font='500 11px '+css('--f-mono');
+  ctx.textAlign='left'; ctx.fillText('avui',x+5,top+12); ctx.restore();
+}};
+
+function when(){
+  const sTxt = state.start==='now' ? 'avui' : `el gener de ${state.start}`;
+  const eTxt = state.end===2026 ? 'avui' : `el desembre de ${state.end}`;
+  return {sTxt,eTxt};
+}
+
+function render(){
+  const s=startM(), e=endM();
+  const err=$('err');
+  const chosen=ASSETS.filter(a=>state.sel.has(a.id));
+  if (e<=s){ err.hidden=false; err.textContent='La data final ha de ser posterior a la inicial. Canvia el camp "Fins a".'; }
+  else if(!chosen.length){ err.hidden=false; err.textContent='Tria almenys un índex o una acció per començar.'; }
+  else err.hidden=true;
+  const ok = err.hidden;
+
+  const res = ok ? chosen.map(a=>({a, r:simulate(a)})) : [];
+  const valid = res.filter(x=>!x.r.na);
+  const single = valid.length===1 && valid[0].r.future;
+  $('lg-band').hidden = !single;
+
+  // titular
+  const hl=$('headline');
+  if (!valid.length){ hl.innerHTML = ok ? 'Cap dels actius triats té dades per a aquesta data d\'inici.' : '&nbsp;'; }
+  else {
+    const best = valid.slice().sort((p,q)=>q.r.grossReal-p.r.grossReal)[0];
+    const {sTxt,eTxt}=when(), r=best.r;
+    const amt = state.dca ? `${eur.format(state.initial)} inicials i ${eur.format(state.monthly)} cada mes` : eur.format(state.initial);
+    const verb = r.future ? 'podrien valer' : 'valdrien';
+    const shown = state.net ? r.netReal : r.grossReal;
+    let extra = `Has aportat ${eur.format(r.paidReal)} en total`;
+    if (state.net) extra += ` · brut ${eur.format(r.grossReal)}, net després d'IRPF`;
+    if (r.future) extra += ` · escenaris: ${eur.format(r.lowReal)} a ${eur.format(r.highReal)}, amb un ritme del ${pctPlain(r.R)} anual`;
+    if (state.inf) extra += ' · en euros d\'avui';
+    const lead = valid.length>1 ? `El millor resultat és el de <strong>${best.a.name}</strong>: ` : '';
+    hl.innerHTML = `${lead}${amt} invertits a ${best.a.name} ${sTxt} ${verb} <strong>${eur.format(shown)}</strong> ${eTxt}.<span class="range">${extra}.</span>`;
+  }
+
+  // taula
+  const heads=['Actiu','Aportat','Valor final','Guany', state.net?'Net (IRPF)':null,'Rendib. anual passat','Ritme de projecció'].filter(Boolean);
+  $('thead').innerHTML=heads.map(h=>`<th>${h}</th>`).join('');
+  const rows = res.slice().sort((p,q)=>(q.r.na?-1:q.r.grossReal)-(p.r.na?-1:p.r.grossReal));
+  $('tbody').innerHTML = rows.map(({a,r})=>{
+    const dot=`<span class="dot" style="background:var(${a.c})"></span>`;
+    if (r.na) return `<tr><td>${dot}${a.name}</td><td colspan="${heads.length-1}" class="na" style="text-align:left">Hi ha dades des de ${a.from}. Tria una data d'inici a partir de gener de ${a.from}.</td></tr>`;
+    const g=r.grossReal-r.paidReal, gp=r.paidReal>0?g/r.paidReal:0;
+    return `<tr><td>${dot}${a.name}</td><td>${eur.format(r.paidReal)}</td><td>${eur.format(r.grossReal)}</td>
+      <td class="${g>=0?'pos':'neg'}">${pct(gp)}</td>
+      ${state.net?`<td>${eur.format(r.netReal)}</td>`:''}
+      <td>${r.histCagr===null?'—':pct(r.histCagr)}</td>
+      <td>${r.future?pct(r.R)+' /any':'—'}</td></tr>`;
+  }).join('');
+
+  // gràfica
+  const ds=[];
+  if (valid.length){
+    const paidSrc = valid[0].r.paidPts;
+    ds.push({label:'Diners aportats',data:paidSrc,borderColor:css('--muted'),borderWidth:1.5,borderDash:[2,3],pointRadius:0,stepped:false,order:5});
+  }
+  for(const {a,r} of valid){
+    const col=css(a.c);
+    if (single){
+      const iLo=ds.length;
+      ds.push({label:a.name+' (pessimista)',data:r.lo,borderColor:rgba(col,.35),borderWidth:1,pointRadius:0,borderDash:[4,4],order:3});
+      ds.push({label:a.name+' (optimista)',data:r.hi,borderColor:rgba(col,.35),borderWidth:1,pointRadius:0,borderDash:[4,4],fill:{target:iLo},backgroundColor:rgba(col,.12),order:3});
+    }
+    ds.push({label:a.name,data:r.pts,borderColor:col,backgroundColor:col,borderWidth:2.2,pointRadius:0,pointHoverRadius:4,order:1,
+      segment:{borderDash:c=>c.p0.parsed.x>=TODAY_X-1e-6?[6,4]:undefined}});
+  }
+  const xMin=T0+s/12, xMax=T0+e/12, span=xMax-xMin;
+  const ink=css('--ink'), muted=css('--muted'), line=css('--line');
+  const cfg={
+    type:'line', data:{datasets:ds},
+    options:{responsive:true,maintainAspectRatio:false,animation:false,parsing:true,
+      interaction:{mode:'nearest',axis:'x',intersect:false},
+      plugins:{legend:{display:false},
+        tooltip:{backgroundColor:css('--surface'),titleColor:ink,bodyColor:ink,borderColor:line,borderWidth:1,
+          titleFont:{family:css('--f-mono')},bodyFont:{family:css('--f-mono')},
+          callbacks:{title:items=>{const x=items[0].parsed.x;const y=Math.floor(x+1e-9);const m=Math.round((x-y)*12);const mm=['gen.','febr.','març','abr.','maig','juny','jul.','ag.','set.','oct.','nov.','des.'];return m===0?`inici de ${y}`:`final de ${mm[m-1]} ${y}`;},
+            label:i=>` ${i.dataset.label}: ${eur.format(i.parsed.y)}`}}},
+      scales:{
+        x:{type:'linear',min:xMin,max:xMax,grid:{color:line,drawTicks:false},border:{color:line},
+          ticks:{color:muted,font:{family:css('--f-mono'),size:11},stepSize:span>30?5:span>12?2:1,callback:v=>Number.isInteger(v)?v:''}},
+        y:{type:state.log?'logarithmic':'linear',beginAtZero:!state.log,grid:{color:line},border:{display:false},
+          ticks:{color:muted,font:{family:css('--f-mono'),size:11},maxTicksLimit:7,callback:v=>eur.format(v)}}
+      }},
+    plugins:[todayLine]
+  };
+  if (chart) chart.destroy();
+  chart = new Chart($('chart'), cfg);
+}
+
+buildChips(); buildSelects(); bind(); render();
+const mq=window.matchMedia('(prefers-color-scheme: dark)');
+if (mq.addEventListener) mq.addEventListener('change',render);
+new MutationObserver(render).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+})();
+</script>
+</body>
+</html>
