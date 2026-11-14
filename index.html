@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Màquina del Temps Borsària</title>
+<link rel="icon" href="logo.svg" type="image/svg+xml">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -37,6 +38,13 @@ body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);font-family
 .wrap{max-width:1240px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
 header{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:12px;border-top:4px double var(--ink);border-bottom:1px solid var(--ink);padding-block:14px 12px}
 h1{font-family:var(--f-display);font-weight:700;font-size:clamp(30px,5vw,50px);line-height:1;margin:0;letter-spacing:-.005em;text-wrap:balance}
+h1{display:flex;align-items:center;gap:.28em}
+.logo{width:.95em;height:.95em;flex:none}
+.lg-bg{fill:var(--surface);stroke:var(--ink);stroke-width:2.5}
+.lg-in{fill:none;stroke:var(--ink);stroke-width:1}
+.lg-tick{stroke:var(--ink);stroke-width:2;stroke-linecap:round}
+.lg-line{fill:none;stroke:var(--accent);stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round}
+.lg-dot{fill:var(--accent)}
 .sub{font-style:italic}
 .sub{color:var(--muted);margin:6px 0 0;max-width:60ch}
 .stamp{font-family:var(--f-mono);font-size:12px;color:var(--muted);border:1px solid var(--ink);border-radius:0;padding:6px 10px;background:transparent;text-transform:uppercase;letter-spacing:.06em}
@@ -107,7 +115,7 @@ td .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right
 <div class="wrap">
   <header>
     <div>
-      <h1>Màquina del Temps Borsària</h1>
+      <h1><svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="30" class="lg-bg"/><circle cx="32" cy="32" r="25.5" class="lg-in"/><path class="lg-tick" d="M32 10.5V14M53.5 32H50M32 53.5V50M10.5 32H14"/><polyline class="lg-line" points="17,43 25,35 31,39 39,28 46,22"/><circle class="lg-dot" cx="46" cy="22" r="3.5"/></svg>Màquina del Temps Borsària</h1>
       <p class="sub">Què hauria passat si haguessis invertit abans, i què podria passar si inverteixes ara. Tria índexs o accions, compara'ls i allarga la història cap al futur.</p>
     </div>
     <div class="hdr-side">
